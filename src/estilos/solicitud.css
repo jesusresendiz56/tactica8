@@ -1,0 +1,46 @@
+/* Reset mínimo */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+/* Recuadro principal */
+.recuadro {
+    width: 850px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    border: 2px solid #000;
+    padding: 20px;
+}
+
+/* Títulos */
+h2, h3 {
+    text-align: center;
+    margin: 15px 0;
+}
+
+/* Párrafos */
+p {
+    margin: 8px 0;
+}
+
+/* Campos de texto */
+input[type="text"],
+input[type="email"],
+input[type="date"],
+input[type="number"] {
+    padding: 4px;
+    margin: 2px;
+}
+
+/* Radios */
+input[type="radio"] {
+    margin-left: 6px;
+}
+
+/* Quitar centrado viejo si usas <center> */
+center {
+    display: block;
+}
