@@ -1,23 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="">
-    <title>Dashboard</title>
+<meta charset="UTF-8">
+<title>Dashboard | TÁCTICA 8</title>
+ <link rel="stylesheet" href="../src/estilos/dashboard.css">   
+
 </head>
 <body>
-    <div>
-    <a href="dashboard.html">Inicio</a>
+<!-- ===== HEADER ===== -->
+<header class="header">
+    <!-- Logo -->
+    <div class="header-logo">
+        <a href="dashboard.html">
+            <img src="../src/imagenes/tactica_logo.png" alt="TÁCTICA 8" class="logo-img"  width="100" height="100">
+        </a>
+    </div>
+
+    <!-- Texto central -->
+    <div class="header-center-text">
+        <strong>Agencia de Servicios Especializados en Marketing con REPSE.</strong><br>
+        Más de 40 años de experiencia.
+    </div>
+
+    <!-- Salir -->
+    <div class="header-exit">
+        <a href="logout.php">
+            <img src="../src/imagenes/logout.png" alt="Salir" class="exit-icon" width="30" height="30">
+        </a>
+    </div>
+</header>
+
+<!-- ===== MENÚ ===== -->
+<nav class="menu">
+    <a href="dashboard.html">Dashboard</a>
     <a href="campañas.html">Campañas</a>
     <a href="personal.html">Personal</a>
     <a href="asignaciones.html">Asignaciones</a>
     <a href="reportes.html">Reportes</a>
     <a href="solicitudes.html">Solicitudes</a>
+</nav>
 
-    
-     
-    </div>
+
+
+<h1>Dashboard</h1>
+
+<div >
+    <div class="card">Campañas Activas</div>
+    <div class="card">Personal Registrado</div>
+    <div class="card">Asignaciones</div>
+    <div class="card">Reportes</div>
+    <div class="card">Solicitudes</div>
+</div>
+</div>
 
 </body>
 </html>

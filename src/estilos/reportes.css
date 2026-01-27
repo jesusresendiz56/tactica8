@@ -1,0 +1,106 @@
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ===== BODY ===== */
+body {
+    background-color: #f4f4f4;
+}
+
+/* ===== HEADER ===== */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background-color: #ec1f27;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    color: #ffffff;
+    z-index: 1000;
+}
+
+/* Logo */
+.header-logo a {
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    object-fit: contain;
+}
+
+/* Texto central */
+.header-center-text {
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+.header-center-text strong {
+    font-size: 15px;
+}
+
+/* Logout */
+.header-exit a {
+    display: flex;
+    align-items: center;
+}
+
+.exit-icon {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.exit-icon:hover {
+    transform: scale(1.1);
+}
+
+/* ===== MENÚ LATERAL ===== */
+.menu {
+    position: fixed;
+    top: 80px; /* debajo del header */
+    left: 0;
+    width: 220px;
+    height: calc(100vh - 80px);
+    background-color: #ffffff;
+    border-right: 3px solid #ec1f27;
+    display: flex;
+    flex-direction: column;
+    padding-top: 15px;
+}
+
+/* Links menú */
+.menu a {
+    text-decoration: none;
+    color: #333333;
+    font-weight: 600;
+    padding: 15px 20px;
+    transition: all 0.3s ease;
+}
+
+/* Hover */
+.menu a:hover {
+    background-color: #ec1f27;
+    color: #ffffff;
+}
+
+/* Activo (opcional) */
+.menu a.active {
+    background-color: #ec1f27;
+    color: #ffffff;
+}
+
+/* ===== CONTENIDO ===== */
+.content {
+    margin-top: 80px;
+    margin-left: 220px;
+    padding: 30px;
+}
