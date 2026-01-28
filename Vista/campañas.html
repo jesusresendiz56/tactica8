@@ -50,12 +50,33 @@
             <input type="text" name="nombre_campaña">
 
             <label>Marca</label>
-            <input type="text" name="marca">
+            <select name="marca" id="marca">
+    <option value="" disabled selected>Seleccionar Marca</option>
+    <option value="dipa">DIPA</option>
+    <option value="slim-pop">SLIM POP</option>
+    <option value="marina-azul">MARINA AZUL</option>
+    <option value="codere">CODERE</option>
+    <option value="manchester">MANCHESTER</option>
+    <option value="mattel">MATTEL</option>
+    <option value="femsa">FEMSA</option>
+    <option value="dont-worry">DONT WORRY</option>
+    <option value="hut">HUT</option>
+    <option value="under-armour">UNDER ARMOUR</option>
+    <option value="kueski">KUESKI</option>
+    <option value="clip">CLIP</option>
+    <option value="ravensburger">RAVENSBURGER</option>
+    <option value="wella">WELLA</option>
+    <option value="sarais">SARAI´S</option>
+    <option value="eggo">EGGO</option>
+    <option value="la-puerta-del-sol">LA PUERTA DEL SOL</option>
+    <option value="aplazo">APLAZO</option>
+    <option value="difoc">DIFOC</option>
+</select>
 
-            <label>Estatus</label>
+            <label>Responsable</label>
             <select>
-                <option>Activa</option>
-                <option>Inactiva</option>
+                <option></option>
+               
             </select>
 
             <button type="submit">Guardar Campaña</button>
@@ -66,9 +87,9 @@
     <section class="table-section">
         <h2>Campañas Existentes</h2>
 
-        <label>Buscar Personal:</label>
+        <label>Buscar Campañas: <img src="../src/imagenes/buscar_campañas.png" alt="Buscar" class="search-icon" width="20" height="20"></label>
 <div class="search-box">
-    <img src="../src/imagenes/buscar_campañas.png" alt="Buscar" class="search-icon" width="20" height="20">
+    
     <input type="search" placeholder="Buscar...">
 </div>
 
