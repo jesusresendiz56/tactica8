@@ -104,3 +104,46 @@ body {
     margin-left: 220px;
     padding: 30px;
 }
+
+/* ===== CONTENIDO ===== */
+.form-section {
+    background-color: #ffffff;
+    max-width: 600px;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.form-section h1 {
+    color: #ec1f27;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #ec1f27;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #c9171e;
+}
+
