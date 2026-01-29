@@ -46,10 +46,9 @@
         <h1>Gestión de Campañas</h1>
 
         <form>
-            <label>Nombre de la Campaña</label>
-            <input type="text" name="nombre_campaña">
+            
 
-            <label>Marca</label>
+            <label>Campaña/Marca</label>
             <select name="marca" id="marca">
     <option value="" disabled selected>Seleccionar Marca</option>
     <option value="dipa">DIPA</option>
@@ -73,10 +72,26 @@
     <option value="difoc">DIFOC</option>
 </select>
 
+            <label>Tipo de Campaña</label>
+            <select name="tipo_campaña">
+                <option value="" disabled selected>Seleccionar Tipo</option>
+                <option value="---">---</option>
+                <option value="---">---</option>
+                <option value="---">---</option>
+            </select>
+
             <label>Responsable</label>
             <select>
                 <option></option>
                
+            </select>
+
+            <label>Estatus</label>
+            <select name="estatus">
+                <option value="pendiente">Pendiente</option>
+                <option value="en_progreso">En Progreso</option>
+                <option value="completada">Completada</option>
+                <option value="cancelada">Cancelada</option>
             </select>
 
             <button type="submit">Guardar Campaña</button>
@@ -100,6 +115,7 @@
                     <th>Tipo</th>
                     <th>Coordinador</th>
                     <th>Estatus</th>
+                    <th>Ver Personal</th>
                 </tr>
             </thead>
             <tbody>
