@@ -5,192 +5,214 @@
     <title>Solicitud de Empleo</title>
     <link rel="stylesheet" href="../src/estilos/solicitud.css">
 </head>
+
 <body>
+    <div class="recuadro">
+        <h2>SOLICITUD DE EMPLEO</h2>
 
-<div class="recuadro">
+        <form>
+            <!-- ===== DATOS DEL PUESTO ===== -->
+            <section>
+                <p>
+                    <label>Puesto:</label>
+                    <input type="text">
 
-<h2>SOLICITUD DE EMPLEO</h2>
+                    <label>Salario:</label>
+                    <input type="text">
+                </p>
+            </section>
 
-<form>
+            <!-- ===== DATOS PERSONALES ===== -->
+            <section>
+                <p>
+                    <label>Nombre completo:</label><br>
+                    <input type="text" placeholder="Apellido Paterno">
+                    <input type="text" placeholder="Apellido Materno">
+                    <input type="text" placeholder="Nombre(s)">
+                </p>
 
-<p>
-    Puesto:
-    <input type="text">
-    Salario:
-    <input type="text">
-</p>
+                <p>
+                    <label>Dirección:</label><br>
+                    <input type="text" placeholder="Calle y número"><br>
+                    <input type="text" placeholder="Colonia">
+                </p>
 
-<p>
-    Nombre:<br>
-    <input type="text" placeholder="Apellido Paterno">
-    <input type="text" placeholder="Apellido Materno">
-    <input type="text" placeholder="Nombre(s)">
-</p>
+                <p>
+                    <label>Ciudad / Estado:</label>
+                    <input type="text">
 
-<p>
-    Dirección:<br>
-    <input type="text" placeholder="Calle y número"><br>
-    <input type="text" placeholder="Colonia">
-</p>
+                    <label>Municipio:</label>
+                    <input type="text">
 
-<p>
-    Ciudad / Estado:
-    <input type="text">
-    Municipio:
-    <input type="text">
-    C.P.:
-    <input type="text">
-</p>
+                    <label>C.P.:</label>
+                    <input type="text">
+                </p>
 
-<p>
-    Celular:
-    <input type="text">
-    Casa:
-    <input type="text">
-</p>
+                <p>
+                    <label>Celular:</label>
+                    <input type="text">
 
-<p>
-    Correo electrónico:
-    <input type="email">
-</p>
+                    <label>Casa:</label>
+                    <input type="text">
+                </p>
 
-<p>
-    Recados:
-    <input type="text">
-</p>
+                <p>
+                    <label>Correo electrónico:</label>
+                    <input type="email">
+                </p>
 
-<p>
-    Lugar de nacimiento:
-    <input type="text">
-</p>
+                <p>
+                    <label>Recados:</label>
+                    <input type="text">
+                </p>
+            </section>
 
-<p>
-    Fecha de nacimiento:
-    <input type="date">
-    Edad:
-    <input type="number">
-    Estado civil:
-    <input type="text">
-</p>
+            <!-- ===== INFORMACIÓN GENERAL ===== -->
+            <section>
+                <p>
+                    <label>Lugar de nacimiento:</label>
+                    <input type="text">
+                </p>
 
-<p>
-    Nombre de la madre:
-    <input type="text">
-</p>
+                <p>
+                    <label>Fecha de nacimiento:</label>
+                    <input type="date">
 
-<p>
-    Nombre del padre:
-    <input type="text">
-</p>
+                    <label>Edad:</label>
+                    <input type="number">
 
-<p>
-    Número de hijos:
-    <input type="number">
-    Edades:
-    <input type="text">
-    ¿Quién los cuida?
-    <input type="text">
-</p>
+                    <label>Estado civil:</label>
+                    <input type="text">
+                </p>
 
-<p>
-    Sexo:
-    <input type="radio" name="sexo"> F
-    <input type="radio" name="sexo"> M
-</p>
+                <p>
+                    <label>Nombre de la madre:</label>
+                    <input type="text">
+                </p>
 
-<p>
-    RFC:
-    <input type="text">
-    IMSS:
-    <input type="text">
-</p>
+                <p>
+                    <label>Nombre del padre:</label>
+                    <input type="text">
+                </p>
 
-<p>
-    CURP:
-    <input type="text">
-</p>
+                <p>
+                    <label>Número de hijos:</label>
+                    <input type="number">
 
-<p>
-    Crédito INFONAVIT:
-    <input type="radio" name="infonavit"> Sí
-    <input type="radio" name="infonavit"> No
-</p>
+                    <label>Edades:</label>
+                    <input type="text">
 
-<p>
-    Crédito FONACOT:
-    <input type="radio" name="fonacot"> Sí
-    <input type="radio" name="fonacot"> No
-</p>
+                    <label>¿Quién los cuida?</label>
+                    <input type="text">
+                </p>
 
-<p>
-    Grado máximo de estudios:
-    <input type="text">
-</p>
+                <p>
+                    <label>Sexo:</label>
+                    <input type="radio" name="sexo"> F
+                    <input type="radio" name="sexo"> M
+                </p>
+            </section>
 
-<p>
-    Número de cuenta nómina:
-    <input type="text">
-</p>
+            <!-- ===== DOCUMENTOS ===== -->
+            <section>
+                <p>
+                    <label>RFC:</label>
+                    <input type="text">
 
-<p>
-    Tipo de sangre:
-    <input type="text">
-</p>
+                    <label>IMSS:</label>
+                    <input type="text">
+                </p>
 
-<h3>REFERENCIAS PERSONALES</h3>
+                <p>
+                    <label>CURP:</label>
+                    <input type="text">
+                </p>
 
-<table border="1" width="100%" cellpadding="5">
-    <tr>
-        <th>Nombre</th>
-        <th>Parentesco</th>
-        <th>Teléfono</th>
-    </tr>
-    <tr>
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-    </tr>
-    <tr>
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-    </tr>
-</table>
+                <p>
+                    <label>Crédito INFONAVIT:</label>
+                    <input type="radio" name="infonavit"> Sí
+                    <input type="radio" name="infonavit"> No
+                </p>
 
-<br>
+                <p>
+                    <label>Crédito FONACOT:</label>
+                    <input type="radio" name="fonacot"> Sí
+                    <input type="radio" name="fonacot"> No
+                </p>
 
-<p>
-    Autorizo a la empresa a compartir mis datos personales con fines únicamente laborales:
-</p>
+                <p>
+                    <label>Grado máximo de estudios:</label>
+                    <input type="text">
+                </p>
 
-<p>
-    <input type="radio" name="autorizo"> Sí
-    <input type="radio" name="autorizo"> No
-</p>
+                <p>
+                    <label>Número de cuenta nómina:</label>
+                    <input type="text">
+                </p>
 
-<br><br>
+                <p>
+                    <label>Tipo de sangre:</label>
+                    <input type="text">
+                </p>
+            </section>
 
-<div class="firmas">
-    <div class="firma">
-        <span></span>
-        <p>Firma del solicitante</p>
+            <!-- ===== REFERENCIAS ===== -->
+            <section>
+                <h3>REFERENCIAS PERSONALES</h3>
+
+                <table border="1" width="100%" cellpadding="5">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Parentesco</th>
+                            <th>Teléfono</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                            <td><input type="text"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- ===== AUTORIZACIÓN ===== -->
+            <section>
+                <p>
+                    Autorizo a la empresa a compartir mis datos personales con fines únicamente laborales:
+                </p>
+
+                <p>
+                    <input type="radio" name="autorizo"> Sí
+                    <input type="radio" name="autorizo"> No
+                </p>
+            </section>
+
+            <!-- ===== FIRMAS ===== -->
+            <section class="firmas">
+                <div class="firma">
+                    <span></span>
+                    <p>Firma del solicitante</p>
+                </div>
+
+                <div class="firma">
+                    <span></span>
+                    <p>Firma de Recursos Humanos</p>
+                </div>
+            </section>
+
+            <!-- ===== BOTÓN ===== -->
+            <p class="acciones">
+                <input type="submit" value="Enviar solicitud">
+            </p>
+        </form>
     </div>
-
-    <div class="firma">
-        <span></span>
-        <p>Firma de Recursos Humanos</p>
-    </div>
-</div>
-
-</form>
-<br><br>
-
-<p style="text-align:center;">
-    <input type="submit" value="Enviar solicitud">
-</p>
-
-
-</div>
-
 </body>
 </html>

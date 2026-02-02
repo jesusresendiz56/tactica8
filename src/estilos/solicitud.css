@@ -1,99 +1,110 @@
-/* ===== RESET BÁSICO ===== */
+/* ===== CONFIGURACIÓN GENERAL ===== */
 * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
     font-family: Arial, Helvetica, sans-serif;
 }
 
-/* ===== BODY ===== */
 body {
-    background: #ec1f27;
-    margin: 0;
-    padding: 20px;
+    background-color: #f4f4f4;
+    padding: 30px;
+    color: #333;
 }
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .recuadro {
-    background: #fff;
     max-width: 900px;
     margin: auto;
+    background-color: #ffffff;
     padding: 30px 40px;
-    border: 1px solid #000;
+    border-radius: 6px;
+    border-top: 8px solid #ec1f27;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* ===== TITULOS ===== */
+/* ===== TÍTULOS ===== */
 h2 {
     text-align: center;
-    margin-bottom: 30px;
+    color: #ec1f27;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
 }
 
 h3 {
-    margin-top: 40px;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #ec1f27;
+    border-bottom: 2px solid #ec1f27;
+    padding-bottom: 5px;
 }
 
 /* ===== FORMULARIO ===== */
-form p {
-    margin-bottom: 15px;
-    line-height: 1.8;
+form section {
+    margin-bottom: 25px;
 }
 
+label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+p {
+    margin-bottom: 15px;
+}
+
+/* ===== INPUTS ===== */
 input[type="text"],
 input[type="email"],
 input[type="number"],
 input[type="date"] {
-    border: none;
-    border-bottom: 1px solid #000;
-    padding: 5px;
-    margin-right: 10px;
-    width: 180px;
+    padding: 8px 10px;
+    margin: 5px 5px 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-width: 180px;
 }
 
-input::placeholder {
-    font-size: 12px;
+input:focus {
+    outline: none;
+    border-color: #ec1f27;
+    box-shadow: 0 0 4px rgba(236, 31, 39, 0.4);
 }
 
-/* Inputs largos */
-input[type="email"] {
-    width: 350px;
-}
-
-/* ===== RADIOS ===== */
+/* ===== RADIO BUTTONS ===== */
 input[type="radio"] {
-    margin-left: 10px;
+    margin-right: 5px;
+    accent-color: #ec1f27;
 }
 
 /* ===== TABLA ===== */
 table {
+    width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
-th, td {
+table th {
+    background-color: #ec1f27;
+    color: #ffffff;
     padding: 8px;
     text-align: center;
 }
 
-th {
-    background: #eaeaea;
+table td {
+    padding: 8px;
+    text-align: center;
 }
 
-/* ===== BOTÓN ===== */
-input[type="submit"] {
-    padding: 10px 25px;
-    border: none;
-    background: #000;
-    color: #fff;
-    cursor: pointer;
+table input {
+    width: 95%;
 }
 
-input[type="submit"]:hover {
-    background: #444;
-}
-
-/* ===== FIRMA ===== */
+/* ===== FIRMAS ===== */
 .firmas {
     display: flex;
     justify-content: space-between;
-    margin-top: 50px;
+    margin-top: 40px;
 }
 
 .firma {
@@ -103,6 +114,52 @@ input[type="submit"]:hover {
 
 .firma span {
     display: block;
-    border-top: 2px solid #000;
+    border-bottom: 2px solid #000;
     margin-bottom: 8px;
+    height: 30px;
+}
+
+/* ===== BOTÓN ===== */
+.acciones {
+    text-align: center;
+    margin-top: 30px;
+}
+
+input[type="submit"] {
+    background-color: #ec1f27;
+    color: #ffffff;
+    border: none;
+    padding: 12px 35px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #c8181f;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .recuadro {
+        padding: 20px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="date"] {
+        min-width: 100%;
+    }
+
+    .firmas {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .firma {
+        width: 100%;
+    }
 }
