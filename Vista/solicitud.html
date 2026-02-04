@@ -8,17 +8,49 @@
 
 <body>
     <div class="recuadro">
+         <div class="logo">
+        <img src="../src/imagenes/logo.png"
+             alt="TÁCTICA 8"
+             class="logo-img"
+             width="120"
+             height="120">
+    </div>
         <h2>SOLICITUD DE EMPLEO</h2>
+    
 
         <form>
+
             <!-- ===== DATOS DEL PUESTO ===== -->
             <section>
                 <p>
                     <label>Puesto:</label>
-                    <input type="text">
+                    <select name="puesto" id="puesto">
+                        <option value="" disabled selected>Seleccionar Puesto</option>
+                        <option value="promotores">PROMOTOR</option>
+                        <option value="demostradoras">DEMOSTRADOR</option>
+                        <option value="coordinadores">COORDINADOR</option>
+                        <option value="supervisores">SUPERVISOR</option>
+                        <option value="asesor">ASESOR</option>
+                        <option value="promovendedor">PROMOVENDEDOR</option>
+                        <option value="degustador">DEGUSTADOR</option>
+                        <option value="auxiliar">AUXILIAR</option>
+                        <option value="chofer">CHOFER</option>
+                        <option value="demostrador">DEMOSTRADOR</option>
+                        <option value="edecanes">EDECANES</option>
+                        <option value="visual-merchandising">VISUAL MERCHANDISING</option>
+                        <option value="ayudante-general">AYUDANTE GENERAL</option>
+                        <option value="promotor-ventas">PROMOTOR DE VENTAS</option>
+                        <option value="infladores-armadores">INFLADORES Y ARMADORES</option>
+                        <option value="capacitador">CAPACITADOR</option>
+                        <option value="reclutador-campo">RECLUTADOR DE CAMPO</option>
+                        <option value="representante-ventas">REPRESENTANTE DE VENTAS</option>
+                        <option value="mercaderista">MERCADERISTA</option>
+                        <option value="analista">ANALISTA</option>
+                        <option value="consultora">CONSULTORA</option>
+                    </select>
 
                     <label>Salario:</label>
-                    <input type="text">
+                    <input type="number">
                 </p>
             </section>
 
@@ -33,37 +65,27 @@
 
                 <p>
                     <label>Dirección:</label><br>
-                    <input type="text" placeholder="Calle y número"><br>
-                    <input type="text" placeholder="Colonia">
-                </p>
-
-                <p>
-                    <label>Ciudad / Estado:</label>
-                    <input type="text">
-
-                    <label>Municipio:</label>
-                    <input type="text">
-
-                    <label>C.P.:</label>
-                    <input type="text">
+                    <input type="text" placeholder="Calle y número">
+                    <input type="text" placeholder="Colonia"><br>
+                    <input type="text" placeholder="Ciudad / Estado">
+                    <input type="text" placeholder="Delegación / Municipio">
+                    <input type="text" placeholder="C.P.">
                 </p>
 
                 <p>
                     <label>Celular:</label>
-                    <input type="text">
+                    <input type="number">
 
                     <label>Casa:</label>
+                    <input type="number"><br>
+
+                    <label>Recados:</label>
                     <input type="text">
                 </p>
 
                 <p>
                     <label>Correo electrónico:</label>
                     <input type="email">
-                </p>
-
-                <p>
-                    <label>Recados:</label>
-                    <input type="text">
                 </p>
             </section>
 
@@ -79,18 +101,22 @@
                     <input type="date">
 
                     <label>Edad:</label>
-                    <input type="number">
+                    <input type="number"><br>
 
                     <label>Estado civil:</label>
-                    <input type="text">
+                    <select name="estado_civil">
+                        <option value="" disabled selected>Seleccionar Estado Civil</option>
+                        <option value="soltero">Soltero(a)</option>
+                        <option value="casado">Casado(a)</option>
+                        <option value="divorciado">Divorciado(a)</option>
+                        <option value="viudo">Viudo(a)</option>
+                    </select>
                 </p>
 
                 <p>
                     <label>Nombre de la madre:</label>
                     <input type="text">
-                </p>
 
-                <p>
                     <label>Nombre del padre:</label>
                     <input type="text">
                 </p>
@@ -100,7 +126,7 @@
                     <input type="number">
 
                     <label>Edades:</label>
-                    <input type="text">
+                    <input type="number"><br>
 
                     <label>¿Quién los cuida?</label>
                     <input type="text">
@@ -108,8 +134,12 @@
 
                 <p>
                     <label>Sexo:</label>
-                    <input type="radio" name="sexo"> F
-                    <input type="radio" name="sexo"> M
+                    <select name="sexo">
+                        <option value="" disabled selected>Seleccionar Sexo</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="femenino">Femenino</option>
+                        <option value="otro">Otro</option>
+                    </select>
                 </p>
             </section>
 
@@ -120,10 +150,8 @@
                     <input type="text">
 
                     <label>IMSS:</label>
-                    <input type="text">
-                </p>
-
-                <p>
+                    <input type="number">
+                
                     <label>CURP:</label>
                     <input type="text">
                 </p>
@@ -132,9 +160,7 @@
                     <label>Crédito INFONAVIT:</label>
                     <input type="radio" name="infonavit"> Sí
                     <input type="radio" name="infonavit"> No
-                </p>
 
-                <p>
                     <label>Crédito FONACOT:</label>
                     <input type="radio" name="fonacot"> Sí
                     <input type="radio" name="fonacot"> No
@@ -147,7 +173,7 @@
 
                 <p>
                     <label>Número de cuenta nómina:</label>
-                    <input type="text">
+                    <input type="number">
                 </p>
 
                 <p>
@@ -172,12 +198,12 @@
                         <tr>
                             <td><input type="text"></td>
                             <td><input type="text"></td>
-                            <td><input type="text"></td>
+                            <td><input type="number"></td>
                         </tr>
                         <tr>
                             <td><input type="text"></td>
                             <td><input type="text"></td>
-                            <td><input type="text"></td>
+                            <td><input type="number"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -195,24 +221,13 @@
                 </p>
             </section>
 
-            <!-- ===== FIRMAS ===== -->
-            <section class="firmas">
-                <div class="firma">
-                    <span></span>
-                    <p>Firma del solicitante</p>
-                </div>
-
-                <div class="firma">
-                    <span></span>
-                    <p>Firma de Recursos Humanos</p>
-                </div>
-            </section>
-
             <!-- ===== BOTÓN ===== -->
             <p class="acciones">
                 <input type="submit" value="Enviar solicitud">
             </p>
+
         </form>
     </div>
 </body>
 </html>
+
