@@ -1,0 +1,134 @@
+/* src/estilos/alertas.css */
+
+/* ESTILOS PARA ALERTAS */
+.alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-out 3.5s forwards;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.alert-success {
+    background-color: #28a745;
+    border-left: 5px solid #1e7e34;
+}
+
+.alert-error {
+    background-color: #dc3545;
+    border-left: 5px solid #c82333;
+}
+
+.alert-warning {
+    background-color: #ffc107;
+    color: #000;
+    border-left: 5px solid #e0a800;
+}
+
+.alert-info {
+    background-color: #17a2b8;
+    border-left: 5px solid #138496;
+}
+
+.alert-close {
+    float: right;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Estilos para estatus en tabla */
+.estatus-pendiente { 
+    background-color: #ffc107; 
+    color: #000; 
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.estatus-en_progreso { 
+    background-color: #17a2b8; 
+    color: white; 
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.estatus-completada { 
+    background-color: #28a745; 
+    color: white; 
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.estatus-cancelada { 
+    background-color: #dc3545; 
+    color: white; 
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Estilos para botones de acción */
+.btn-action {
+    background-color: #17a2b8;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.btn-action:hover {
+    background-color: #138496;
+}
+
+.btn-guardar {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.btn-guardar:hover {
+    background-color: #218838;
+}
