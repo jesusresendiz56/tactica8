@@ -15,40 +15,7 @@ require_once '../Modelo/conexion.php';
 </head>
 
 <body>
-    <!-- ===== ALERTA DINÁMICA ===== -->
-    <?php
-    if (isset($_GET['mensaje']) && isset($_GET['texto'])) {
-        $tipo = $_GET['mensaje'];
-        $texto = urldecode($_GET['texto']);
-        
-        $clase = '';
-        $icono = '';
-        
-        switch($tipo) {
-            case 'success':
-                $clase = 'alert-success';
-                $icono = '✓';
-                break;
-            case 'error':
-                $clase = 'alert-error';
-                $icono = '✗';
-                break;
-            case 'warning':
-                $clase = 'alert-warning';
-                $icono = '⚠';
-                break;
-            case 'info':
-                $clase = 'alert-info';
-                $icono = 'ℹ';
-                break;
-        }
-        
-        echo "<div class='alert $clase' id='auto-alert'>
-                <span class='alert-close' onclick='cerrarAlerta(this)'>×</span>
-                <strong>$icono</strong> $texto
-              </div>";
-    }
-    ?>
+    
     
     <!-- ===== HEADER ===== -->
     <header class="header">
