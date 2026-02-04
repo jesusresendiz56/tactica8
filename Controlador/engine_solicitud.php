@@ -200,7 +200,7 @@ try {
         }
         
         // Guardar mensaje de éxito
-        $_SESSION['solicitud_exito'] = "✅ Solicitud enviada exitosamente. Número de folio: $id_solicitud";
+        $_SESSION['solicitud_exito'] = "✅ Solicitud enviada exitosamente. Nos pondremos en contacto contigo pronto.";
         
         // REDIRIGIR UNA SOLA VEZ
         header("Location: ../Vista/solicitud.php");
