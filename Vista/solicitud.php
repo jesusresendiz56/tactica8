@@ -1,8 +1,15 @@
 <?php
-// Vista/solicitud.php
 session_start();
-?>
+require_once "../Modelo/SupaConexion.php";
 
+/* Obtener puestos desde la BD */
+$stmt = $conn->query("
+    SELECT id_puesto, nombre_puesto
+    FROM cat_puestos
+    ORDER BY nombre_puesto
+");
+$puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,252 +19,195 @@ session_start();
 </head>
 
 <body>
-    <div class="recuadro">
-        <div class="logo">
-            <img src="../src/imagenes/logo.png"
-                 alt="TÁCTICA 8"
-                 class="logo-img"
-                 width="120"
-                 height="120">
-        </div>
-        
+<div class="recuadro">
+
+    <header class="encabezado">
+        <img src="../src/imagenes/logo.png" alt="TÁCTICA 8">
         <h2>SOLICITUD DE EMPLEO</h2>
-        
-        <!-- MOSTRAR MENSAJES -->
-        <?php if (isset($_SESSION['solicitud_exito'])): ?>
-            <div class="mensaje exito">
-                <?php 
-                echo $_SESSION['solicitud_exito']; 
-                unset($_SESSION['solicitud_exito']); 
-                ?>
+    </header>
+
+    <!-- Mensajes -->
+    <?php if (!empty($_SESSION['solicitud_exito'])): ?>
+        <div class="mensaje exito">
+            <?= $_SESSION['solicitud_exito']; unset($_SESSION['solicitud_exito']); ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($_SESSION['solicitud_errores'])): ?>
+        <div class="mensaje error">
+            <ul>
+                <?php foreach ($_SESSION['solicitud_errores'] as $e): ?>
+                    <li><?= $e ?></li>
+                <?php endforeach; unset($_SESSION['solicitud_errores']); ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
+    <form method="POST" action="../Controlador/engine_solicitud.php">
+
+        <!-- ===== DATOS DEL PUESTO ===== -->
+        <fieldset>
+            <legend>Datos del Puesto</legend>
+            <div class="grid-2">
+                <div>
+                    <label>Puesto</label>
+                    <select name="id_puesto" required>
+                        <option value="">Seleccionar puesto</option>
+                        <?php foreach ($puestos as $p): ?>
+                            <option value="<?= $p['id_puesto'] ?>">
+                                <?= htmlspecialchars($p['nombre_puesto']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div>
+                    <label>Salario deseado</label>
+                    <input type="number" name="salario_deseado" step="0.01">
+                </div>
             </div>
-        <?php endif; ?>
-        
-        <?php if (isset($_SESSION['solicitud_errores'])): ?>
-            <div class="mensaje error">
-                <strong>❌ Error al enviar la solicitud:</strong>
-                <ul class="lista-errores">
-                    <?php 
-                    foreach ($_SESSION['solicitud_errores'] as $error) {
-                        echo "<li>$error</li>";
-                    }
-                    unset($_SESSION['solicitud_errores']); 
-                    ?>
-                </ul>
+        </fieldset>
+
+        <!-- ===== DATOS PERSONALES ===== -->
+        <fieldset>
+            <legend>Datos Personales</legend>
+            <div class="grid-3">
+                <input type="text" name="apellido_paterno" placeholder="Apellido paterno" required>
+                <input type="text" name="apellido_materno" placeholder="Apellido materno">
+                <input type="text" name="nombre" placeholder="Nombre(s)" required>
             </div>
-        <?php endif; ?>
-        
-        <!-- FORMULARIO -->
-        <form method="POST" action="../Controlador/engine_solicitud.php">
 
-            <!-- ===== DATOS DEL PUESTO ===== -->
-            <section>
-                <p>
-                    <label>Puesto:</label>
-                    <select name="puesto" id="puesto" required>
-                        <option value="" disabled selected>Seleccionar Puesto</option>
-                        <option value="promotor">PROMOTOR</option>
-                        <option value="demostrador">DEMOSTRADOR</option>
-                        <option value="coordinador">COORDINADOR</option>
-                        <option value="supervisor">SUPERVISOR</option>
-                        <option value="asesor">ASESOR</option>
-                        <option value="promovendedor">PROMOVENDEDOR</option>
-                        <option value="degustador">DEGUSTADOR</option>
-                        <option value="auxiliar">AUXILIAR</option>
-                        <option value="chofer">CHOFER</option>
-                        <option value="edecan">EDECANES</option>
-                        <option value="visual_merchandising">VISUAL MERCHANDISING</option>
-                        <option value="ayudante_general">AYUDANTE GENERAL</option>
-                        <option value="promotor_ventas">PROMOTOR DE VENTAS</option>
-                        <option value="inflador_armador">INFLADORES Y ARMADORES</option>
-                        <option value="capacitador">CAPACITADOR</option>
-                        <option value="reclutador_campo">RECLUTADOR DE CAMPO</option>
-                        <option value="representante_ventas">REPRESENTANTE DE VENTAS</option>
-                        <option value="mercaderista">MERCADERISTA</option>
-                        <option value="analista">ANALISTA</option>
-                        <option value="consultora">CONSULTORA</option>
-                    </select>
+            <div class="grid-3">
+                <input type="date" name="fecha_nacimiento">
+                <input type="text" name="lugar_nacimiento" placeholder="Lugar de nacimiento">
+                <select name="sexo">
+                    <option value="">Sexo</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="femenino">Femenino</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
 
-                    <label>Salario deseado:</label>
-                    <input type="number" name="salario" step="0.01" min="0">
-                </p>
-            </section>
+            <div class="grid-3">
+                <input type="number" name="celular" placeholder="Celular">
+                <input type="number" name="telefono_casa" placeholder="Teléfono de casa">
+                <input type="number" name="telefono_recados" placeholder="Teléfono de recados">
+            </div>
 
-            <!-- ===== DATOS PERSONALES ===== -->
-            <section>
-                <p>
-                    <label>Nombre completo:</label><br>
-                    <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" required>
-                    <input type="text" name="apellido_materno" placeholder="Apellido Materno">
-                    <input type="text" name="nombres" placeholder="Nombre(s)" required>
-                </p>
+            <div class="grid-2">
+                <input type="email" name="correo" placeholder="Correo electrónico" required>
+                <select name="estado_civil">
+                    <option value="">Estado civil</option>
+                    <option value="soltero">Soltero(a)</option>
+                    <option value="casado">Casado(a)</option>
+                    <option value="union_libre">Unión libre</option>
+                    <option value="divorciado">Divorciado(a)</option>
+                    <option value="viudo">Viudo(a)</option>
+                </select>
+            </div>
 
-                <p>
-                    <label>Dirección:</label><br>
-                    <input type="text" name="calle_numero" placeholder="Calle y número">
-                    <input type="text" name="colonia" placeholder="Colonia"><br>
-                    <input type="text" name="ciudad_estado" placeholder="Ciudad / Estado">
-                    <input type="text" name="municipio_delegacion" placeholder="Delegación / Municipio">
-                    <input type="text" name="codigo_postal" placeholder="C.P.">
-                </p>
+            <div class="grid-2">
+                <label>Tipo de sangre</label>
+                <select name="tipo_sangre">
+                    <option value="">Seleccionar</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                </select>
+            </div>
 
-                <p>
-                    <label>Celular:</label>
-                    <input type="tel" name="celular">
+            <div class="grid-2">
+                <label>¿Crédito Infonavit?</label>
+                <select name="credito_infonavit">
+                    <option value="">Seleccionar</option>
+                    <option value="TRUE">Sí</option>
+                    <option value="FALSE">No</option>
+                </select>
+                <label>¿Crédito Fonacot?</label>
+                <select name="credito_fonacot">
+                    <option value="">Seleccionar</option>
+                    <option value="TRUE">Sí</option>
+                    <option value="FALSE">No</option>
+                </select>
+            </div>
+        </fieldset>
 
-                    <label>Teléfono Casa:</label>
-                    <input type="tel" name="telefono_casa"><br>
+        <!-- ===== DIRECCIÓN ===== -->
+        <fieldset>
+            <legend>Dirección</legend>
+            <div class="grid-3">
+                <input type="text" name="calle" placeholder="Calle y Numero">
+                <input type="text" name="colonia" placeholder="Colonia">
+                <input type="text" name="cp" placeholder="Código postal">
+            </div>
+            <div class="grid-3">
+                <input type="text" name="ciudad" placeholder="Ciudad">
+                <input type="text" name="municipio" placeholder="Municipio">
+                <input type="text" name="estado" placeholder="Estado">
+            </div>
+        </fieldset>
 
-                    <label>Teléfono Recados:</label>
-                    <input type="tel" name="telefono_recados">
-                </p>
+        <!-- ===== DOCUMENTOS ===== -->
+        <fieldset>
+            <legend>Documentos</legend>
+            <div class="grid-4">
+                <input type="text" name="rfc" placeholder="RFC">
+                <input type="text" name="curp" placeholder="CURP">
+                <input type="text" name="imss" placeholder="IMSS">
+                <input type="text" name="grado_estudios" placeholder="Grado de estudios">
+            </div>
+        </fieldset>
 
-                <p>
-                    <label>Correo electrónico:</label>
-                    <input type="email" name="correo" required>
-                </p>
-            </section>
+        <!-- ===== DATOS FAMILIARES ===== -->
+        <fieldset>
+            <legend>Datos Familiares</legend>
+            <div class="grid-3">
+                <input type="text" name="nombre_padre" placeholder="Nombre del padre">
+                <input type="text" name="nombre_madre" placeholder="Nombre de la madre">
+                <input type="number" name="numero_hijos" placeholder="Número de hijos">
+            </div>
+            <div class="grid-1">
+                <input type="text" name="quien_los_cuida" placeholder="Quién los cuida">
+            </div>
+        </fieldset>
 
-            <!-- ===== INFORMACIÓN GENERAL ===== -->
-            <section>
-                <p>
-                    <label>Lugar de nacimiento:</label>
-                    <input type="text" name="lugar_nacimiento">
-                </p>
+        <!-- ===== REFERENCIAS ===== -->
+        <fieldset>
+            <legend>Referencias Personales</legend>
+            <div class="referencia">
+                <input type="text" name="ref_nombre[]" placeholder="Nombre">
+                <input type="text" name="ref_parentesco[]" placeholder="Parentesco">
+                <input type="number" name="ref_telefono[]" placeholder="Teléfono">
+            </div>
+            <div class="referencia">
+                <input type="text" name="ref_nombre[]" placeholder="Nombre">
+                <input type="text" name="ref_parentesco[]" placeholder="Parentesco">
+                <input type="number" name="ref_telefono[]" placeholder="Teléfono">
+            </div>
+        </fieldset>
 
-                <p>
-                    <label>Fecha de nacimiento:</label>
-                    <input type="date" name="fecha_nacimiento">
+        <!-- ===== AUTORIZACIÓN ===== -->
+        <fieldset class="autorizacion">
+            <label>Autorizo a la empresa a usar mis datos:</label>
+            <select name="autorizacion_datos" required>
+                <option value="">Seleccionar</option>
+                <option value="TRUE">Sí</option>
+                <option value="FALSE">No</option>
+            </select>
+        </fieldset>
 
-                    <label>Edad:</label>
-                    <input type="number" name="edad" min="18" max="70"><br>
+        <div class="acciones">
+            <button type="submit">Enviar solicitud</button>
+            <button type="reset" class="secundario">Limpiar</button>
+        </div>
 
-                    <label>Estado civil:</label>
-                    <select name="estado_civil">
-                        <option value="" disabled selected>Seleccionar Estado Civil</option>
-                        <option value="soltero">Soltero(a)</option>
-                        <option value="casado">Casado(a)</option>
-                        <option value="divorciado">Divorciado(a)</option>
-                        <option value="viudo">Viudo(a)</option>
-                        <option value="union_libre">Unión Libre</option>
-                    </select>
-                </p>
-
-                <p>
-                    <label>Nombre de la madre:</label>
-                    <input type="text" name="nombre_madre">
-
-                    <label>Nombre del padre:</label>
-                    <input type="text" name="nombre_padre">
-                </p>
-
-                <p>
-                    <label>Número de hijos:</label>
-                    <input type="number" name="numero_hijos" min="0" max="20">
-
-                    <label>Edades (separadas por coma):</label>
-                    <input type="text" name="edades_hijos" placeholder="Ej: 5,8,12"><br>
-
-                    <label>¿Quién los cuida?</label>
-                    <input type="text" name="quien_cuida_hijos">
-                </p>
-
-                <p>
-                    <label>Sexo:</label>
-                    <select name="sexo">
-                        <option value="" disabled selected>Seleccionar Sexo</option>
-                        <option value="masculino">Masculino</option>
-                        <option value="femenino">Femenino</option>
-                        <option value="otro">Otro</option>
-                    </select>
-                </p>
-            </section>
-
-            <!-- ===== DOCUMENTOS ===== -->
-            <section>
-                <p>
-                    <label>RFC:</label>
-                    <input type="text" name="rfc">
-
-                    <label>Número IMSS:</label>
-                    <input type="text" name="imss">
-                
-                    <label>CURP:</label>
-                    <input type="text" name="curp">
-                </p>
-
-                <p>
-                    <label>Crédito INFONAVIT:</label>
-                    <input type="radio" name="infonavit" value="si"> Sí
-                    <input type="radio" name="infonavit" value="no" checked> No
-
-                    <label>Crédito FONACOT:</label>
-                    <input type="radio" name="fonacot" value="si"> Sí
-                    <input type="radio" name="fonacot" value="no" checked> No
-                </p>
-
-                <p>
-                    <label>Grado máximo de estudios:</label>
-                    <input type="text" name="grado_estudios">
-                </p>
-
-                <p>
-                    <label>Número de cuenta nómina:</label>
-                    <input type="text" name="num_cuenta_nomina">
-                </p>
-
-                <p>
-                    <label>Tipo de sangre:</label>
-                    <input type="text" name="tipo_sangre">
-                </p>
-            </section>
-
-            <!-- ===== REFERENCIAS ===== -->
-            <section>
-                <h3>REFERENCIAS PERSONALES</h3>
-
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Parentesco</th>
-                            <th>Teléfono</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input type="text" name="ref1_nombre"></td>
-                            <td><input type="text" name="ref1_parentesco"></td>
-                            <td><input type="tel" name="ref1_telefono"></td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" name="ref2_nombre"></td>
-                            <td><input type="text" name="ref2_parentesco"></td>
-                            <td><input type="tel" name="ref2_telefono"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-
-            <!-- ===== AUTORIZACIÓN ===== -->
-            <section>
-                <p>
-                    Autorizo a la empresa a compartir mis datos personales con fines únicamente laborales:
-                </p>
-
-                <p>
-                    <input type="radio" name="autorizo" value="si"> Sí
-                    <input type="radio" name="autorizo" value="no" checked> No
-                </p>
-            </section>
-
-            <!-- ===== BOTÓN ===== -->
-            <p class="acciones">
-                <input type="submit" value="Enviar solicitud">
-                <input type="reset" value="Limpiar formulario">
-            </p>
-
-        </form>
-    </div>
+    </form>
+</div>
 </body>
 </html>
+
+

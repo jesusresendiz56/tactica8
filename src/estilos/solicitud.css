@@ -1,183 +1,195 @@
-/* ===== CONFIGURACIÓN GENERAL ===== */
+/* =========================
+   Variables
+========================= */
+:root {
+    --color-base: #ec1f27;
+    --color-fondo: #f9f9f9;
+    --color-texto: #333;
+    --color-borde: #ccc;
+    --color-exito: #28a745;
+    --color-error: #dc3545;
+    --radio-radius: 5px;
+    --padding: 10px;
+}
+
+/* =========================
+   Reset básico
+========================= */
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Arial, sans-serif;
 }
 
 body {
-    background-color: #f4f4f4;
-    padding: 30px;
-    color: #333;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.5;
+    padding: 20px;
 }
 
-/* ===== CONTENEDOR PRINCIPAL ===== */
+/* =========================
+   Contenedor principal
+========================= */
 .recuadro {
     max-width: 900px;
-    margin: auto;
-    background-color: #ffffff;
-    padding: 30px 40px;
-    border-radius: 6px;
-    border-top: 8px solid #ec1f27;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin: 0 auto;
+    background: #fff;
+    padding: 25px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-/* ===== TÍTULOS ===== */
-h2 {
+/* =========================
+   Encabezado
+========================= */
+.encabezado {
     text-align: center;
-    color: #ec1f27;
-    margin-bottom: 25px;
-    letter-spacing: 2px;
-}
-
-h3 {
-    margin-top: 30px;
-    margin-bottom: 15px;
-    color: #ec1f27;
-    border-bottom: 2px solid #ec1f27;
-    padding-bottom: 5px;
-}
-
-/* ===== FORMULARIO ===== */
-form section {
     margin-bottom: 25px;
 }
 
-label {
+.encabezado img {
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+.encabezado h2 {
+    color: var(--color-base);
+    font-size: 24px;
+}
+
+/* =========================
+   Mensajes de éxito/error
+========================= */
+.mensaje {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
     font-weight: bold;
-    margin-right: 5px;
 }
 
-p {
-    margin-bottom: 15px;
+.mensaje.exito {
+    background-color: var(--color-exito);
+    color: #fff;
 }
 
-/* ===== INPUTS ===== */
+.mensaje.error {
+    background-color: var(--color-error);
+    color: #fff;
+}
+
+.mensaje.error ul {
+    margin-top: 5px;
+    list-style: disc inside;
+}
+
+/* =========================
+   Fieldset y legend
+========================= */
+fieldset {
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio-radius);
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+legend {
+    padding: 0 10px;
+    font-weight: bold;
+    color: var(--color-base);
+}
+
+/* =========================
+   Grid para campos
+========================= */
+.grid-1 { display: grid; grid-template-columns: 1fr; gap: 15px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+
+.referencia {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* =========================
+   Inputs y selects
+========================= */
 input[type="text"],
-input[type="email"],
 input[type="number"],
-input[type="date"] {
-    padding: 8px 10px;
-    margin: 5px 5px 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    min-width: 180px;
-}
-
-input:focus {
-    outline: none;
-    border-color: #ec1f27;
-    box-shadow: 0 0 4px rgba(236, 31, 39, 0.4);
-}
-
-/* ===== RADIO BUTTONS ===== */
-input[type="radio"] {
-    margin-right: 5px;
-    accent-color: #ec1f27;
-}
-
-/* ===== TABLA ===== */
-table {
+input[type="date"],
+input[type="email"],
+select {
     width: 100%;
-    border-collapse: collapse;
+    padding: var(--padding);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-radius);
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+input:focus,
+select:focus {
+    border-color: var(--color-base);
+    outline: none;
+    box-shadow: 0 0 5px rgba(236,31,39,0.3);
+}
+
+/* =========================
+   Botones
+========================= */
+.acciones {
+    display: flex;
+    gap: 15px;
     margin-top: 10px;
 }
 
-table th {
-    background-color: #ec1f27;
-    color: #ffffff;
-    padding: 8px;
-    text-align: center;
-}
-
-table td {
-    padding: 8px;
-    text-align: center;
-}
-
-table input {
-    width: 95%;
-}
-
-/* ===== FIRMAS ===== */
-.firmas {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 40px;
-}
-
-.firma {
-    width: 45%;
-    text-align: center;
-}
-
-.firma span {
-    display: block;
-    border-bottom: 2px solid #000;
-    margin-bottom: 8px;
-    height: 30px;
-}
-
-/* ===== BOTÓN ===== */
-.acciones {
-    text-align: center;
-    margin-top: 30px;
-}
-
-input[type="submit"] {
-    background-color: #ec1f27;
-    color: #ffffff;
+button {
+    padding: 12px 20px;
     border: none;
-    padding: 12px 35px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 4px;
+    border-radius: var(--radio-radius);
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 16px;
+    color: #fff;
+    background-color: var(--color-base);
+    transition: 0.3s;
 }
 
-input[type="submit"]:hover {
-    background-color: #c8181f;
+button:hover {
+    background-color: #b81721;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .recuadro {
-        padding: 20px;
+button.secundario {
+    background-color: #6c757d;
+}
+
+button.secundario:hover {
+    background-color: #5a6268;
+}
+
+/* =========================
+   Autorización (radio/select)
+========================= */
+.autorizacion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.autorizacion label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* =========================
+   Responsivo
+========================= */
+@media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4, .referencia {
+        grid-template-columns: 1fr !important;
     }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="number"],
-    input[type="date"] {
-        min-width: 100%;
-    }
-
-    .firmas {
-        flex-direction: column;
-        gap: 30px;
-    }
-
-    .firma {
-        width: 100%;
-    }
-}
-select {
-    width: 100%;
-    padding: 8px;
-    margin: 8px 0 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-/* ===== LOGO ===== */
-.logo {
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-.logo-img {
-    max-width: 120px;
-    height: auto;
 }

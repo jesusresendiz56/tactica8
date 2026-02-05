@@ -6,17 +6,14 @@ $password = "B4seD4tosT4ctica8";
 $port = "5432";
 
 try {
-    $conexion = new PDO(
+    $conn = new PDO(
         "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require",
         $user,
-        $password,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-        ]
+        $password
     );
-    echo "Conexión exitosa";
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
+    die("Error de conexión a la base de datos.");
 }
-?>
 

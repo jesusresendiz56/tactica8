@@ -2,7 +2,9 @@
 session_start();
 require_once "../Modelo/SupaConexion.php";
 
-// Validar campos vacíos
+/* ===============================
+   VALIDACIÓN BÁSICA
+================================ */
 if (empty($_POST['email']) || empty($_POST['password'])) {
     header("Location: ../Vista/login.php?error=campos_vacios");
     exit();
@@ -12,26 +14,26 @@ $email = trim($_POST['email']);
 $password = trim($_POST['password']);
 
 try {
-    // Buscar usuario por correo
+    /* ===============================
+       CONSULTA DE USUARIO RH
+    ================================ */
     $sql = "SELECT id_usuario, correo, password
             FROM usuarios_rh
             WHERE correo = :correo
             LIMIT 1";
 
-    $stmt = $conexion->prepare($sql);
+    $stmt = $conn->prepare($sql);
     $stmt->bindParam(':correo', $email, PDO::PARAM_STR);
     $stmt->execute();
 
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+    $usuario = $stmt->fetch();
 
-    // VALIDACIÓN TEMPORAL (SIN HASH)
+  
     if ($usuario && $password === $usuario['password']) {
 
-        // Crear sesión
         $_SESSION['id_usuario'] = $usuario['id_usuario'];
-        $_SESSION['correo'] = $usuario['correo'];
+        $_SESSION['correo']     = $usuario['correo'];
 
-        // Redirigir al dashboard
         header("Location: ../Vista/dashboard.html");
         exit();
 
@@ -41,6 +43,5 @@ try {
     }
 
 } catch (PDOException $e) {
-    die("Error en el login: " . $e->getMessage());
+    die("Error en el login.");
 }
-?>
