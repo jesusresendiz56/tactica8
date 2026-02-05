@@ -1,41 +1,46 @@
 <?php
 session_start();
-require_once "../Modelo/conexion.php";
+require_once "../Modelo/SupaConexion.php";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+// Validar campos vacíos
+if (empty($_POST['email']) || empty($_POST['password'])) {
+    header("Location: ../Vista/login.php?error=campos_vacios");
+    exit();
+}
 
-    $correo = trim($_POST["email"]);
-    $password = trim($_POST["password"]);
+$email = trim($_POST['email']);
+$password = trim($_POST['password']);
 
-    if (empty($correo) || empty($password)) {
-        header("Location: ../Vista/login.php?error=campos_vacios");
-        exit;
-    }
+try {
+    // Buscar usuario por correo
+    $sql = "SELECT id_usuario, correo, password
+            FROM usuarios_rh
+            WHERE correo = :correo
+            LIMIT 1";
 
-    $sql = "SELECT id_usuario FROM usuarios_rh 
-            WHERE correo = ? AND password = ?";
+    $stmt = $conexion->prepare($sql);
+    $stmt->bindParam(':correo', $email, PDO::PARAM_STR);
+    $stmt->execute();
 
-    $stmt = mysqli_prepare($conn, $sql);
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$stmt) {
-        die("Error en la consulta");
-    }
+    // VALIDACIÓN TEMPORAL (SIN HASH)
+    if ($usuario && $password === $usuario['password']) {
 
-    mysqli_stmt_bind_param($stmt, "ss", $correo, $password);
-    mysqli_stmt_execute($stmt);
-    $resultado = mysqli_stmt_get_result($stmt);
+        // Crear sesión
+        $_SESSION['id_usuario'] = $usuario['id_usuario'];
+        $_SESSION['correo'] = $usuario['correo'];
 
-    if ($usuario = mysqli_fetch_assoc($resultado)) {
-
-        $_SESSION["id_usuario"] = $usuario["id_usuario"];
-        $_SESSION["correo"] = $correo;
-
+        // Redirigir al dashboard
         header("Location: ../Vista/dashboard.html");
-        exit;
+        exit();
 
     } else {
         header("Location: ../Vista/login.php?error=credenciales");
-        exit;
+        exit();
     }
+
+} catch (PDOException $e) {
+    die("Error en el login: " . $e->getMessage());
 }
 ?>
