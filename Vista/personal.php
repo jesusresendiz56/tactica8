@@ -1,3 +1,14 @@
+<?php
+// personal.php - USUARIO A LA IZQUIERDA DEL LOGOUT
+session_start();
+
+// VERIFICACIÓN DE SESIÓN
+if (!isset($_SESSION['id_usuario'])) {
+    header('Location: login.php?error=no_sesion');
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,7 +22,7 @@
     <header class="header">
         <!-- Logo -->
         <div class="header-logo">
-            <a href="dashboard.html">
+            <a href="dashboard.php">
                 <img src="../src/imagenes/tactica_logo.png"
                      alt="TÁCTICA 8"
                      class="logo-img"
@@ -26,9 +37,30 @@
             Más de 40 años de experiencia.
         </div>
 
-        <!-- Salir -->
+        <!-- USUARIO A LA IZQUIERDA, LOGOUT A LA DERECHA -->
         <div class="header-exit">
-            <a href="login.php">
+            <!-- Usuario primero (izquierda) -->
+            <div class="user-info" style="margin-right: 15px; text-align: right;">
+                <span class="user-name" style="display: block; color: white; font-weight: bold;">
+                    <?php 
+                    echo isset($_SESSION['usuario_nombre']) 
+                        ? htmlspecialchars($_SESSION['usuario_nombre']) 
+                        : 'Usuario';
+                    ?>
+                </span>
+                <span class="user-email" style="display: block; color: white; font-size: 12px; opacity: 0.8;">
+                    <?php 
+                    echo isset($_SESSION['correo']) 
+                        ? htmlspecialchars($_SESSION['correo']) 
+                        : '';
+                    ?>
+                </span>
+            </div>
+            
+            <!-- Logout después (derecha) -->
+            <a href="../Controlador/logout.php" 
+               onclick="return confirm('¿Estás seguro de cerrar sesión?')"
+               title="Cerrar Sesión">
                 <img src="../src/imagenes/logout.png"
                      alt="Salir"
                      class="exit-icon"
@@ -40,11 +72,11 @@
 
     <!-- ===== MENÚ ===== -->
     <nav class="menu">
-        <a href="dashboard.html">Dashboard</a>
+        <a href="dashboard.php">Dashboard</a>
         <a href="campañas.php">Campañas</a>
-        <a href="personal.html">Personal</a>
-        <a href="asignaciones.html">Asignaciones</a>
-        <a href="reportes.html">Reportes</a>
+        <a href="personal.php" class="active">Personal</a>
+        <a href="asignaciones.php">Asignaciones</a>
+        <a href="reportes.php">Reportes</a>
         <a href="solicitudes.php">Solicitudes</a>
     </nav>
 

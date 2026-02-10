@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE.php>
+.php lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Asignaciones | TÁCTICA 8</title>
@@ -11,7 +11,7 @@
     <header class="header">
         <!-- Logo -->
         <div class="logo">
-            <a href="dashboard.html">
+            <a href="dashboard.php">
                 <img src="../src/imagenes/tactica_logo.png"
                      alt="TÁCTICA 8"
                      class="logo-img"
@@ -40,11 +40,11 @@
 
     <!-- ===== MENÚ ===== -->
     <nav class="menu">
-       <a href="dashboard.html">Dashboard</a>
+       <a href="dashboard.php">Dashboard</a>
         <a href="campañas.php">Campañas</a>
-        <a href="personal.html">Personal</a>
-        <a href="asignaciones.html">Asignaciones</a>
-        <a href="reportes.html">Reportes</a>
+        <a href="personal.php">Personal</a>
+        <a href="asignaciones.php">Asignaciones</a>
+        <a href="reportes.php">Reportes</a>
         <a href="solicitudes.php">Solicitudes</a>
     </nav>
 
@@ -99,4 +99,4 @@
         </section>
     </main>
 </body>
-</html>
+<.php>
