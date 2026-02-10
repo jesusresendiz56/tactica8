@@ -1,5 +1,14 @@
 <?php
+// campañas.php - VERSIÓN INTEGRADA Y CORREGIDA
 session_start();
+
+// VERIFICACIÓN DE SESIÓN - CORREGIDA
+// Verifica la variable correcta que guardas en validar_login.php
+if (!isset($_SESSION['id_usuario'])) {
+    header('Location: login.php?error=no_sesion');
+    exit();
+}
+
 require_once '../Modelo/SupaConexion.php';
 ?>
 
@@ -9,6 +18,36 @@ require_once '../Modelo/SupaConexion.php';
     <meta charset="UTF-8">
     <title>Campañas | TÁCTICA 8</title>
     <link rel="stylesheet" href="../src/estilos/campañas.css">
+    <style>
+        /* Estilos adicionales para el header de usuario */
+        .header-user {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-align: right;
+        }
+        .user-info {
+            margin-right: 15px;
+        }
+        .user-name {
+            font-weight: bold;
+            display: block;
+        }
+        .user-email {
+            font-size: 12px;
+            opacity: 0.8;
+            display: block;
+        }
+        .logout-link {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        .logout-link:hover {
+            opacity: 0.8;
+        }
+    </style>
 </head>
 
 <body>
@@ -16,7 +55,7 @@ require_once '../Modelo/SupaConexion.php';
 <header class="header">
     <div class="header-logo">
         <a href="dashboard.php">
-            <img src="../src/imagenes/tactica_logo.png" width="100">
+            <img src="../src/imagenes/tactica_logo.png" width="100" alt="TÁCTICA 8">
         </a>
     </div>
 
@@ -25,9 +64,31 @@ require_once '../Modelo/SupaConexion.php';
         Más de 40 años de experiencia.
     </div>
 
-    <div class="header-exit">
-        <a href="login.php">
-            <img src="../src/imagenes/logout.png" width="30">
+    <!-- HEADER DE USUARIO CORREGIDO -->
+    <div class="header-user">
+        <div class="user-info">
+            <span class="user-name">
+                <?php 
+                // Mostrar nombre del usuario
+                if (isset($_SESSION['usuario_nombre'])) {
+                    echo htmlspecialchars($_SESSION['usuario_nombre']);
+                } else {
+                    echo 'Usuario';
+                }
+                ?>
+            </span>
+            <span class="user-email">
+                <?php 
+                // Mostrar correo del usuario
+                echo isset($_SESSION['correo']) ? htmlspecialchars($_SESSION['correo']) : '';
+                ?>
+            </span>
+        </div>
+        <a href="../Controlador/logout.php" 
+           class="logout-link"
+           onclick="return confirm('¿Estás seguro de cerrar sesión?')"
+           title="Cerrar Sesión">
+            <img src="../src/imagenes/logout.png" width="30" alt="Cerrar Sesión">
         </a>
     </div>
 </header>
@@ -82,11 +143,11 @@ require_once '../Modelo/SupaConexion.php';
         </select>
 
         <label>Nombre de la Campaña</label>
-        <input type="text" name="nombre_campaña" required>
+        <input type="text" name="nombre_campaña" required placeholder="Ej: Lanzamiento Primavera 2024">
 
         <label>Estatus</label>
         <select name="estatus">
-            <option value="pendiente">Pendiente</option>
+            <option value="pendiente" selected>Pendiente</option>
             <option value="en_progreso">En Progreso</option>
             <option value="completada">Completada</option>
             <option value="cancelada">Cancelada</option>
@@ -99,7 +160,12 @@ require_once '../Modelo/SupaConexion.php';
 <section class="table-section">
     <h2>Campañas Existentes</h2>
 
-    <table>
+    <!-- Búsqueda -->
+    <div style="margin-bottom: 20px;">
+        <input type="search" id="searchInput" placeholder="Buscar campañas..." style="padding: 8px; width: 300px;">
+    </div>
+
+    <table id="campaignsTable">
         <thead>
             <tr>
                 <th>Campaña / Marca</th>
@@ -123,26 +189,35 @@ require_once '../Modelo/SupaConexion.php';
             INNER JOIN marcas m ON c.marca_id = m.id_marca
             INNER JOIN tipos_campaña tc ON c.tipo_campaña_id = tc.id_tipo
             INNER JOIN responsables r ON c.responsable_id = r.id_responsable
-            ORDER BY c.fecha_registro DESC
+            ORDER BY c.created_at DESC
         ";
 
         $stmt = $conn->query($sql);
 
         if ($stmt->rowCount() > 0) {
             foreach ($stmt as $row) {
+                // Clase CSS según estatus
+                $estatus_class = '';
+                switch ($row['estatus']) {
+                    case 'pendiente': $estatus_class = 'status-pending'; break;
+                    case 'en_progreso': $estatus_class = 'status-in-progress'; break;
+                    case 'completada': $estatus_class = 'status-completed'; break;
+                    case 'cancelada': $estatus_class = 'status-cancelled'; break;
+                }
+                
                 echo "
                 <tr>
                     <td><strong>{$row['nombre_campaña']}</strong><br><small>{$row['marca']}</small></td>
                     <td>{$row['tipo']}</td>
                     <td>{$row['responsable']}</td>
-                    <td>{$row['estatus']}</td>
+                    <td><span class='{$estatus_class}'>{$row['estatus']}</span></td>
                     <td>
                         <a href='personal_campania.php?id={$row['id_campaña']}'>👥 Personal</a>
                     </td>
                 </tr>";
             }
         } else {
-            echo "<tr><td colspan='5'>No hay campañas registradas</td></tr>";
+            echo "<tr><td colspan='5' style='text-align: center; padding: 20px;'>No hay campañas registradas</td></tr>";
         }
         ?>
         </tbody>
@@ -151,6 +226,41 @@ require_once '../Modelo/SupaConexion.php';
 
 </main>
 
+<script>
+    // Búsqueda en tiempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const table = document.getElementById('campaignsTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const filter = this.value.toLowerCase();
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    const text = row.textContent.toLowerCase();
+                    
+                    if (text.indexOf(filter) > -1) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        }
+        
+        // Confirmación antes de logout
+        const logoutLink = document.querySelector('a[href*="logout.php"]');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function(e) {
+                if (!confirm('¿Estás seguro de cerrar sesión?')) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script>
+
 </body>
 </html>
-

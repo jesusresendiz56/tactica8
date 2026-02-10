@@ -26,15 +26,23 @@ try {
     $stmt->bindParam(':correo', $email, PDO::PARAM_STR);
     $stmt->execute();
 
-    $usuario = $stmt->fetch();
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  
     if ($usuario && $password === $usuario['password']) {
-
+        /* ===============================
+           CREAR SESIÓN
+        ================================ */
         $_SESSION['id_usuario'] = $usuario['id_usuario'];
-        $_SESSION['correo']     = $usuario['correo'];
+        $_SESSION['usuario_id'] = $usuario['id_usuario']; // Duplicado para compatibilidad
+        $_SESSION['correo'] = $usuario['correo'];
+        $_SESSION['usuario_nombre'] = 'Administrador'; // Cambia esto si tienes columna 'nombre'
+        $_SESSION['usuario_rol'] = 'admin'; // Cambia según tu lógica de roles
+        $_SESSION['login_time'] = time();
 
-        header("Location: ../Vista/dashboard.html");
+        /* ===============================
+           REDIRIGIR AL DASHBOARD
+        ================================ */
+        header("Location: ../Vista/dashboard.php");
         exit();
 
     } else {
@@ -43,5 +51,7 @@ try {
     }
 
 } catch (PDOException $e) {
-    die("Error en el login.");
+    header("Location: ../Vista/login.php?error=servidor");
+    exit();
 }
+?>
