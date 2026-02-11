@@ -242,8 +242,8 @@ $conn = null;
         
         .content {
             margin-top: 80px;
-            margin-left: 220px;
-            padding: 30px;
+            
+            padding: 30px 40px;
         }
         
         /* Responsive */
@@ -370,12 +370,7 @@ $conn = null;
             </div>
         </div>
 
-        <!-- INFORMACIÓN DE SESIÓN -->
-        <div style="margin-top: 40px; font-size: 12px; color: #999; text-align: right; border-top: 1px solid #ddd; padding-top: 20px;">
-            ID de Usuario: <?php echo $_SESSION['id_usuario']; ?> | 
-            Usuario: <?php echo htmlspecialchars($usuario_nombre); ?> | 
-            Email: <?php echo htmlspecialchars($usuario_correo); ?>
-        </div>
+      
     </div>
 </body>
 </html>
