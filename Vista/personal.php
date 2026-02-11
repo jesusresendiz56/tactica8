@@ -186,6 +186,7 @@ $usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmai
                     (e.ctrlKey && e.shiftKey && e.key === 'I'),
                     (e.ctrlKey && e.shiftKey && e.key === 'J'),
                     (e.ctrlKey && e.key === 'U'),
+                     (e.ctrlKey && e.key === 'u'),
                     (e.ctrlKey && e.key === 's'),
                     (e.ctrlKey && e.key === 'S'),
                     (e.ctrlKey && e.shiftKey && e.key === 'C'),
