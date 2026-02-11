@@ -2,117 +2,133 @@
    Variables
 ========================= */
 :root {
-    --color-base: #ec1f27;
-    --color-fondo: #f9f9f9;
-    --color-texto: #333;
-    --color-borde: #ccc;
-    --color-exito: #28a745;
-    --color-error: #dc3545;
-    --radio-radius: 5px;
-    --padding: 10px;
+  --color-base: #ec1f27;
+  --color-fondo: #f9f9f9;
+  --color-texto: #333;
+  --color-borde: #ccc;
+  --color-exito: #28a745;
+  --color-error: #dc3545;
+  --radio-radius: 5px;
+  --padding: 10px;
 }
 
 /* =========================
    Reset básico
 ========================= */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
 }
 
 body {
-    background-color: var(--color-fondo);
-    color: var(--color-texto);
-    line-height: 1.5;
-    padding: 20px;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  line-height: 1.5;
+  padding: 20px;
 }
 
 /* =========================
    Contenedor principal
 ========================= */
 .recuadro {
-    max-width: 900px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 25px 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* =========================
    Encabezado
 ========================= */
 .encabezado {
-    text-align: center;
-    margin-bottom: 25px;
+  text-align: center;
+  margin-bottom: 25px;
 }
 
 .encabezado img {
-    width: 100px;
-    margin-bottom: 10px;
+  width: 100px;
+  margin-bottom: 10px;
 }
 
 .encabezado h2 {
-    color: var(--color-base);
-    font-size: 24px;
+  color: var(--color-base);
+  font-size: 24px;
 }
 
 /* =========================
    Mensajes de éxito/error
 ========================= */
 .mensaje {
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    font-weight: bold;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  font-weight: bold;
 }
 
 .mensaje.exito {
-    background-color: var(--color-exito);
-    color: #fff;
+  background-color: var(--color-exito);
+  color: #fff;
 }
 
 .mensaje.error {
-    background-color: var(--color-error);
-    color: #fff;
+  background-color: var(--color-error);
+  color: #fff;
 }
 
 .mensaje.error ul {
-    margin-top: 5px;
-    list-style: disc inside;
+  margin-top: 5px;
+  list-style: disc inside;
 }
 
 /* =========================
    Fieldset y legend
 ========================= */
 fieldset {
-    border: 2px solid var(--color-borde);
-    border-radius: var(--radio-radius);
-    padding: 15px;
-    margin-bottom: 20px;
+  border: 2px solid var(--color-borde);
+  border-radius: var(--radio-radius);
+  padding: 15px;
+  margin-bottom: 20px;
 }
 
 legend {
-    padding: 0 10px;
-    font-weight: bold;
-    color: var(--color-base);
+  padding: 0 10px;
+  font-weight: bold;
+  color: var(--color-base);
 }
 
 /* =========================
    Grid para campos
 ========================= */
-.grid-1 { display: grid; grid-template-columns: 1fr; gap: 15px; }
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+.grid-1 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
 
 .referencia {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 /* =========================
@@ -123,73 +139,76 @@ input[type="number"],
 input[type="date"],
 input[type="email"],
 select {
-    width: 100%;
-    padding: var(--padding);
-    border: 1px solid var(--color-borde);
-    border-radius: var(--radio-radius);
-    font-size: 14px;
-    transition: 0.3s;
+  width: 100%;
+  padding: var(--padding);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-radius);
+  font-size: 14px;
+  transition: 0.3s;
 }
 
 input:focus,
 select:focus {
-    border-color: var(--color-base);
-    outline: none;
-    box-shadow: 0 0 5px rgba(236,31,39,0.3);
+  border-color: var(--color-base);
+  outline: none;
+  box-shadow: 0 0 5px rgba(236, 31, 39, 0.3);
 }
 
 /* =========================
    Botones
 ========================= */
 .acciones {
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
 }
 
 button {
-    padding: 12px 20px;
-    border: none;
-    border-radius: var(--radio-radius);
-    cursor: pointer;
-    font-size: 16px;
-    color: #fff;
-    background-color: var(--color-base);
-    transition: 0.3s;
+  padding: 12px 20px;
+  border: none;
+  border-radius: var(--radio-radius);
+  cursor: pointer;
+  font-size: 16px;
+  color: #fff;
+  background-color: var(--color-base);
+  transition: 0.3s;
 }
 
 button:hover {
-    background-color: #b81721;
+  background-color: #b81721;
 }
 
 button.secundario {
-    background-color: #6c757d;
+  background-color: #6c757d;
 }
 
 button.secundario:hover {
-    background-color: #5a6268;
+  background-color: #5a6268;
 }
 
 /* =========================
    Autorización (radio/select)
 ========================= */
 .autorizacion {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .autorizacion label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 /* =========================
    Responsivo
 ========================= */
 @media (max-width: 900px) {
-    .grid-2, .grid-3, .grid-4, .referencia {
-        grid-template-columns: 1fr !important;
-    }
+  .grid-2,
+  .grid-3,
+  .grid-4,
+  .referencia {
+    grid-template-columns: 1fr !important;
+  }
 }

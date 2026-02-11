@@ -1,85 +1,85 @@
 /* ===== RESET ===== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ===== BODY ===== */
 body {
-    background: #ec1f27;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background: #ec1f27;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ===== CONTENEDOR ===== */
 .container {
-    background: #fff;
-    width: 360px;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    text-align: center;
+  background: #fff;
+  width: 360px;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 /* ===== LOGO ===== */
 .logo {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .logo img {
-    width: 130px;
-    height: auto;
+  width: 130px;
+  height: auto;
 }
 
 /* ===== TITULO ===== */
 h1 {
-    margin-bottom: 20px;
-    color: #ec1f27;
+  margin-bottom: 20px;
+  color: #ec1f27;
 }
 
 /* ===== FORMULARIO ===== */
 .form-group {
-    text-align: left;
-    margin-bottom: 15px;
+  text-align: left;
+  margin-bottom: 15px;
 }
 
 .form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
 }
 
 .form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    outline: none;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
 }
 
 .form-group input:focus {
-    border-color: #ec1f27;
+  border-color: #ec1f27;
 }
 
 /* ===== BOTÓN ===== */
 button {
-    width: 100%;
-    padding: 12px;
-    background: #ec1f27;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
+  width: 100%;
+  padding: 12px;
+  background: #ec1f27;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 button:hover {
-    background: #c8171f;
+  background: #c8171f;
 }
