@@ -119,6 +119,7 @@ $conn = null;
     <meta charset="UTF-8">
     <title>Dashboard | TÁCTICA 8</title>
     <link rel="stylesheet" href="../src/estilos/dashboard.css">
+   
     <style>
         /* Mantener estilos originales del dashboard.css */
         
