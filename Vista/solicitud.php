@@ -157,7 +157,7 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="grid-4">
                 <input type="text" name="rfc" placeholder="RFC">
                 <input type="text" name="curp" placeholder="CURP">
-                <input type="text" name="imss" placeholder="IMSS">
+                <input type="number" name="imss" placeholder="IMSS">
                 <input type="text" name="grado_estudios" placeholder="Grado de estudios">
             </div>
         </fieldset>
