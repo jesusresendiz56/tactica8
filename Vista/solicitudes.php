@@ -148,13 +148,13 @@ foreach ($solicitudes as $solicitud) {
                                     </a>
 
                                     <?php if ($solicitud['estatus'] == 'pendiente'): ?>
-                                        <a href="procesar_solicitud.php?accion=aceptar&id=<?php echo $solicitud['id']; ?>" 
+                                        <a href="../Controlador/engine_procesar_solicitud.php?accion=aceptar&id=<?php echo $solicitud['id']; ?>" 
                                            class="btn-accion btn-aceptar" 
                                            onclick="return confirm('¿Aceptar esta solicitud?')" 
                                            title="Aceptar solicitud">
                                             <img src="../src/imagenes/aceptar.png" alt="Aceptar" width="24" height="24">
                                         </a>
-                                        <a href="procesar_solicitud.php?accion=rechazar&id=<?php echo $solicitud['id']; ?>" 
+                                        <a href="../Controlador/engine_procesar_solicitud.php?accion=rechazar&id=<?php echo $solicitud['id']; ?>" 
                                            class="btn-accion btn-rechazar" 
                                            onclick="return confirm('¿Rechazar esta solicitud?')" 
                                            title="Rechazar solicitud">

@@ -1,19 +1,35 @@
 <?php
-$host = "aws-0-us-west-2.pooler.supabase.com";
-$dbname = "postgres";
-$user = "postgres.fbhirrxvzubnwnivrarl";
-$password = "B4seD4tosT4ctica8";
-$port = "5432";
-
-try {
-    $conn = new PDO(
-        "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require",
-        $user,
-        $password
-    );
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("Error de conexión a la base de datos.");
+// Modelo/SupaConexion.php - VERSIÓN CON CLASE
+class SupaConexion {
+    private $host = "aws-0-us-west-2.pooler.supabase.com";
+    private $dbname = "postgres";
+    private $user = "postgres.fbhirrxvzubnwnivrarl";
+    private $password = "B4seD4tosT4ctica8";
+    private $port = "5432";
+    public $conn;
+    
+    public function __construct() {
+        try {
+            $this->conn = new PDO(
+                "pgsql:host={$this->host};port={$this->port};dbname={$this->dbname};sslmode=require",
+                $this->user,
+                $this->password
+            );
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
+            echo "";
+            
+        } catch (PDOException $e) {
+            echo "❌ Error de conexión: " . $e->getMessage();
+            die();
+        }
+    }
+    
+    public function getConexion() {
+        return $this->conn;
+    }
 }
 
+$db = new SupaConexion();
+$conn = $db->getConexion();
+?>  
