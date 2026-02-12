@@ -1,14 +1,11 @@
 <?php
-// personal_campania.php
 session_start();
 
-// VERIFICACIÓN DE SESIÓN
 if (!isset($_SESSION['id_usuario'])) {
     header('Location: login.php?error=no_sesion');
     exit();
 }
 
-// VERIFICAR QUE SE RECIBIÓ EL ID DE CAMPAÑA
 if (!isset($_GET['id'])) {
     header('Location: campañas.php');
     exit();
@@ -16,12 +13,13 @@ if (!isset($_GET['id'])) {
 
 $id_campaña = $_GET['id'];
 
-// INCLUIR CONEXIÓN
 require_once '../Modelo/SupaConexion.php';
 $db = new SupaConexion();
 $conn = $db->getConexion();
 
-// Obtener información de la campaña
+/* =========================
+   OBTENER CAMPAÑA
+========================= */
 $sql_campaña = "
     SELECT 
         c.id_campaña,
@@ -47,7 +45,9 @@ if (!$campaña) {
     exit();
 }
 
-// Obtener personal asignado a la campaña
+/* =========================
+   OBTENER PERSONAL ASIGNADO
+========================= */
 $sql_asignados = "
     SELECT 
         a.id_asignacion,
@@ -78,167 +78,277 @@ $asignados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Personal de Campaña | TÁCTICA 8</title>
-    <link rel="stylesheet" href="../src/estilos/campañas.css">
+<meta charset="UTF-8">
+<title>Personal de Campaña | TÁCTICA 8</title>
+
+<link rel="stylesheet" href="../src/estilos/estilos.css">
+
+<style>
+/* =========================
+   CONTENIDO SIN MENÚ
+========================= */
+.content.no-menu {
+    margin-left: 0;
+    max-width: 1200px;
+    margin: 100px auto 40px auto;
+}
+
+/* =========================
+   HEADER PÁGINA
+========================= */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    color: #ec1f27;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 14px;
+}
+
+/* =========================
+   BOTÓN
+========================= */
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* =========================
+   CARD CAMPAÑA
+========================= */
+.campaign-card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 35px;
+    border-top: 4px solid #ec1f27;
+}
+
+.campaign-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ec1f27;
+    margin-bottom: 20px;
+}
+
+.campaign-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.label {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+/* BADGE */
+.badge {
+    background-color: #ec1f27;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* =========================
+   TABLE
+========================= */
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.search-input {
+    max-width: 250px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    transition: 0.2s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #ec1f27;
+    box-shadow: 0 0 5px rgba(236,31,39,0.3);
+}
+</style>
+
 </head>
 <body>
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="header-logo">
-            <a href="dashboard.php">
-                <img src="../src/imagenes/tactica_logo.png"
-                     alt="TÁCTICA 8"
-                     class="logo-img"
-                     width="100"
-                     height="100">
-            </a>
-        </div>
 
-        <div class="header-center-text">
-            <strong>Agencia de Servicios Especializados en Marketing con REPSE.</strong><br>
-            Más de 40 años de experiencia.
-        </div>
+<!-- HEADER -->
+<header class="header">
+    <div class="header-logo">
+        <a href="campañas.php">
+            <img src="../src/imagenes/tactica_logo.png"
+                 alt="TÁCTICA 8"
+                 class="logo-img"
+                 width="100">
+        </a>
+    </div>
 
-        <!-- USUARIO Y LOGOUT -->
-        <div class="header-exit">
-            <div style="display: flex; align-items: center; color: white;">
-                <div style="margin-right: 15px; text-align: right;">
-                    <div style="font-weight: bold;">
-                        <?php echo $_SESSION['usuario_nombre'] ?? 'Usuario'; ?>
-                    </div>
-                    <div style="font-size: 12px;">
-                        <?php echo $_SESSION['correo'] ?? ''; ?>
-                    </div>
-                </div>
-                <a href="../Controlador/logout.php" 
-                   onclick="return confirm('¿Cerrar sesión?')">
-                    <img src="../src/imagenes/logout.png"
-                         alt="Salir"
-                         width="30"
-                         height="30">
-                </a>
+    <div class="header-center-text">
+        <strong>Agencia de Servicios Especializados en Marketing con REPSE.</strong><br>
+        Más de 40 años de experiencia.
+    </div>
+
+    <div class="header-exit">
+        <div style="text-align:right;">
+            <div style="font-weight:bold;">
+                <?php echo $_SESSION['usuario_nombre'] ?? 'Usuario'; ?>
+            </div>
+            <div style="font-size:12px;">
+                <?php echo $_SESSION['correo'] ?? ''; ?>
             </div>
         </div>
-    </header>
+        <a href="../Controlador/logout.php" 
+           onclick="return confirm('¿Cerrar sesión?')">
+            <img src="../src/imagenes/logout.png"
+                 alt="Salir"
+                 width="30">
+        </a>
+    </div>
+</header>
 
-    <!-- ===== MENÚ ===== -->
-    <nav class="menu">
-        <a href="dashboard.php">Dashboard</a>
-        <a href="campañas.php">Campañas</a>
-        <a href="personal.php">Personal</a>
-        <a href="asignaciones.php">Asignaciones</a>
-        <a href="reportes.php">Reportes</a>
-        <a href="solicitudes.php">Solicitudes</a>
-    </nav>
+<main class="content no-menu">
 
-    <!-- ===== CONTENIDO ===== -->
-    <main class="content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div class="page-header">
+        <div>
             <h1>Personal de Campaña</h1>
-            <a href="campañas.php" style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-                ← Volver a Campañas
-            </a>
+            <p class="subtitle">Gestión del equipo asignado</p>
         </div>
 
-        <!-- Información de la campaña -->
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 30px; border-left: 5px solid #007bff;">
-            <h2 style="margin-top: 0; color: #007bff;"><?php echo htmlspecialchars($campaña['nombre_campaña']); ?></h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <div>
-                    <strong>Marca:</strong><br>
-                    <?php echo htmlspecialchars($campaña['marca']); ?>
-                </div>
-                <div>
-                    <strong>Tipo:</strong><br>
-                    <?php echo htmlspecialchars($campaña['tipo_campaña']); ?>
-                </div>
-                <div>
-                    <strong>Responsable:</strong><br>
-                    <?php echo htmlspecialchars($campaña['responsable']); ?>
-                </div>
-                <div>
-                    <strong>Estatus:</strong><br>
-                    <span style="background: <?php 
-                        echo $campaña['estatus'] == 'activa' ? '#28a745' : 
-                            ($campaña['estatus'] == 'pendiente' ? '#ffc107' : '#dc3545'); 
-                    ?>; color: <?php echo $campaña['estatus'] == 'pendiente' ? 'black' : 'white'; ?>; 
-                    padding: 3px 10px; border-radius: 3px; display: inline-block;">
-                        <?php echo ucfirst($campaña['estatus']); ?>
-                    </span>
-                </div>
+        <a href="campañas.php" class="btn-secondary">
+            ← Volver a Campañas
+        </a>
+    </div>
+
+    <section class="campaign-card">
+        <div class="campaign-title">
+            <?php echo htmlspecialchars($campaña['nombre_campaña']); ?>
+        </div>
+
+        <div class="campaign-grid">
+            <div>
+                <span class="label">Marca</span>
+                <?php echo htmlspecialchars($campaña['marca']); ?>
+            </div>
+
+            <div>
+                <span class="label">Tipo</span>
+                <?php echo htmlspecialchars($campaña['tipo_campaña']); ?>
+            </div>
+
+            <div>
+                <span class="label">Responsable</span>
+                <?php echo htmlspecialchars($campaña['responsable']); ?>
+            </div>
+
+            <div>
+                <span class="label">Estatus</span>
+                <span class="badge">
+                    <?php echo ucfirst($campaña['estatus']); ?>
+                </span>
             </div>
         </div>
+    </section>
 
-        <!-- SOLO TABLA DE PERSONAL ASIGNADO -->
-        <section class="table-section">
+    <section class="table-section">
+        <div class="table-header">
             <h2>Personal Asignado (<?php echo count($asignados); ?>)</h2>
 
-            <div style="margin-bottom: 20px;">
-                <input type="search" id="searchAsignados" placeholder="Buscar personal asignado..." 
-                       style="padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 3px;">
-            </div>
+            <input type="search" 
+                   id="searchAsignados"
+                   class="search-input"
+                   placeholder="Buscar personal...">
+        </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>No. Empleado</th>
-                        <th>Nombre</th>
-                        <th>Puesto</th>
-                        <th>Rol</th>
-                        <th>Fecha Inicio</th>
-                        <th>Fecha Fin</th>
-                        <th>Estatus</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (count($asignados) > 0): ?>
-                        <?php foreach ($asignados as $asignado): 
-                            $nombre_completo = trim(
-                                ($asignado['nombre'] ?? '') . ' ' . 
-                                ($asignado['apellido_paterno'] ?? '') . ' ' . 
-                                ($asignado['apellido_materno'] ?? '')
-                            );
-                        ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($asignado['num_empleado'] ?? 'N/A'); ?></td>
-                                <td><?php echo htmlspecialchars($nombre_completo ?: 'Sin nombre'); ?></td>
-                                <td><?php echo htmlspecialchars($asignado['nombre_puesto'] ?? 'Sin puesto'); ?></td>
-                                <td><?php echo htmlspecialchars($asignado['rol'] ?? 'No especificado'); ?></td>
-                                <td><?php echo $asignado['fecha_inicio'] ? date('d/m/Y', strtotime($asignado['fecha_inicio'])) : 'N/A'; ?></td>
-                                <td><?php echo $asignado['fecha_fin'] ? date('d/m/Y', strtotime($asignado['fecha_fin'])) : 'N/A'; ?></td>
-                                <td>
-                                    <span style="background: <?php 
-                                        echo $asignado['estatus_asignacion'] == 'activa' ? '#28a745' : '#dc3545'; 
-                                    ?>; color: white; padding: 3px 10px; border-radius: 3px; font-size: 12px; display: inline-block;">
-                                        <?php echo ucfirst($asignado['estatus_asignacion']); ?>
-                                    </span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="7" style="text-align: center; padding: 30px; color: #666;">
-                                No hay personal asignado a esta campaña.
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </section>
-    </main>
+        <table>
+            <thead>
+                <tr>
+                    <th>No. Empleado</th>
+                    <th>Nombre</th>
+                    <th>Puesto</th>
+                    <th>Rol</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Fin</th>
+                    <th>Estatus</th>
+                </tr>
+            </thead>
+            <tbody>
 
-    <script>
-        // Búsqueda en tiempo real
-        document.getElementById('searchAsignados').addEventListener('keyup', function() {
-            var searchText = this.value.toLowerCase();
-            var rows = document.querySelectorAll('tbody tr');
-            
-            rows.forEach(function(row) {
-                var text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchText) ? '' : 'none';
-            });
-        });
-    </script>
+<?php if (count($asignados) > 0): ?>
+<?php foreach ($asignados as $asignado):
+
+$nombre_completo = trim(
+    ($asignado['nombre'] ?? '') . ' ' .
+    ($asignado['apellido_paterno'] ?? '') . ' ' .
+    ($asignado['apellido_materno'] ?? '')
+);
+?>
+
+<tr>
+    <td><?php echo htmlspecialchars($asignado['num_empleado'] ?? 'N/A'); ?></td>
+    <td><?php echo htmlspecialchars($nombre_completo ?: 'Sin nombre'); ?></td>
+    <td><?php echo htmlspecialchars($asignado['nombre_puesto'] ?? 'Sin puesto'); ?></td>
+    <td><?php echo htmlspecialchars($asignado['rol'] ?? 'No especificado'); ?></td>
+    <td><?php echo $asignado['fecha_inicio'] ? date('d/m/Y', strtotime($asignado['fecha_inicio'])) : 'N/A'; ?></td>
+    <td><?php echo $asignado['fecha_fin'] ? date('d/m/Y', strtotime($asignado['fecha_fin'])) : 'N/A'; ?></td>
+    <td><?php echo ucfirst($asignado['estatus_asignacion']); ?></td>
+</tr>
+
+<?php endforeach; ?>
+<?php else: ?>
+<tr>
+    <td colspan="7" style="text-align:center; padding:30px;">
+        No hay personal asignado a esta campaña.
+    </td>
+</tr>
+<?php endif; ?>
+
+            </tbody>
+        </table>
+    </section>
+
+</main>
+
+<script>
+document.getElementById('searchAsignados').addEventListener('keyup', function() {
+    let searchText = this.value.toLowerCase();
+    let rows = document.querySelectorAll('tbody tr');
+
+    rows.forEach(function(row) {
+        let text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchText) ? '' : 'none';
+    });
+});
+</script>
+
 </body>
 </html>
+

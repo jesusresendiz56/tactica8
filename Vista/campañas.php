@@ -14,7 +14,7 @@ require_once '../Modelo/SupaConexion.php';
 <head>
     <meta charset="UTF-8">
     <title>Campañas | TÁCTICA 8</title>
-    <link rel="stylesheet" href="../src/estilos/campañas.css">
+    <link rel="stylesheet" href="../src/estilos/estilos.css">
     <style>
         .header-user { display: flex; align-items: center; color: white; text-align: right; }
         .user-info { margin-right: 15px; }

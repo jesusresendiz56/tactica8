@@ -46,7 +46,7 @@ $asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <title>Asignaciones | TÁCTICA 8</title>
-    <link rel="stylesheet" href="../src/estilos/asignaciones.css">
+    <link rel="stylesheet" href="../src/estilos/estilos.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .alert-success {
