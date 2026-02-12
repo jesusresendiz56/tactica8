@@ -189,7 +189,9 @@ if ($stmt->rowCount() > 0) {
             <td>" . ($row['fecha_fin'] ? date('d/m/Y', strtotime($row['fecha_fin'])) : '-') . "</td>
             <td><span class='{$estatus_class}'>{$row['estatus']}</span></td>
             <td>
-                <a href='personal_campaña.php?id={$row['id_campaña']}' style='color:#3498db;'>👥 Personal</a>
+         <a href='personal_campaña.php?id={$row['id_campaña']}' title='Ver personal' style='text-decoration:none;'>
+    <img src='../src/imagenes/personal.png' alt='Icono Personal' style='width:16px; height:16px; vertical-align:middle; border:none;'>
+</a>
             </td>
         </tr>";
     }

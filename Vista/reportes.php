@@ -57,16 +57,10 @@ $usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmai
                 </span>
             </div>
             
-            <a href="../Controlador/logout.php" 
-               class="exit-link"
-               onclick="return confirm('¿Estás seguro de cerrar sesión?')"
-               title="Cerrar Sesión">
-                <img src="../src/imagenes/logout.png"
-                     alt="Salir"
-                     class="exit-icon"
-                     width="30"
-                     height="30">
-            </a>
+          <a href="../Controlador/logout.php" class="logout-link"
+           onclick="return confirm('¿Estás seguro de cerrar sesión?')">
+            <img src="../src/imagenes/logout.png" width="30" alt="Cerrar Sesión">
+        </a>
         </div>
     </header>
 
