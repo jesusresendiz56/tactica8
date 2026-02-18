@@ -176,13 +176,23 @@ table {
 th {
     background-color: #ec1f27;
     color: #ffffff;
-    padding: 10px;
+    padding: 12px 15px;
     text-align: left;
+    border-right: 1px solid rgba(255,255,255,0.3); /* separación columnas header */
+}
+
+th:last-child {
+    border-right: none;
 }
 
 td {
-    padding: 10px;
+    padding: 12px 15px;
     border-bottom: 1px solid #ddd;
+    border-right: 1px solid #eee; /* separación columnas */
+}
+
+td:last-child {
+    border-right: none;
 }
 
 tr:hover td {
