@@ -8,37 +8,18 @@ if (!isset($_SESSION['id_usuario'])) {
     exit();
 }
 
-// INCLUIR Y USAR LA CONEXIÓN
+// SOLO MOSTRAR VISTA
 require_once '../Modelo/SupaConexion.php';
-$db = new SupaConexion();
-$conn = $db->getConexion();
 
-// Obtener lista de asignaciones para mostrar
-$sql_asignaciones = "
-    SELECT 
-        a.id_asignacion,
-        a.fecha_asignacion,
-        a.estatus_asignacion,
-        p.num_empleado,
-        s.nombre,
-        s.apellido_paterno,
-        s.apellido_materno,
-        cp.nombre_puesto,
-        r.nombre AS responsable_nombre,
-        m.nombre AS marca_nombre,
-        c.nombre_campaña
-    FROM asignaciones a
-    INNER JOIN personal p ON a.id_personal = p.id_personal
-    INNER JOIN solicitud s ON p.id_solicitud = s.id_solicitud
-    LEFT JOIN cat_puestos cp ON s.id_puesto = cp.id_puesto
-    INNER JOIN responsables r ON a.id_responsable = r.id_responsable
-    INNER JOIN campañas c ON a.id_campaña = c.id_campaña
-    INNER JOIN marcas m ON c.marca_id = m.id_marca
-    ORDER BY a.fecha_asignacion DESC
-    LIMIT 50
-";
-
-$asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $db = new SupaConexion();
+    $conn = $db->getConexion();
+} catch (Exception $e) {
+    die("<div style='background:#f8d7da; color:#721c24; padding:20px; margin:20px; border-radius:5px;'>
+         <h3>❌ ERROR DE CONEXIÓN</h3>
+         <p>" . $e->getMessage() . "</p>
+         </div>");
+}
 ?>
 
 <!DOCTYPE html>
@@ -47,7 +28,6 @@ $asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <title>Asignaciones | TÁCTICA 8</title>
     <link rel="stylesheet" href="../src/estilos/estilos.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .alert-success {
             background-color: #d4edda;
@@ -167,10 +147,11 @@ $asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
                     echo "❌ Todos los campos son obligatorios.";
                 } elseif ($_GET['error'] == 'personal_ya_asignado') {
                     echo "❌ Este personal ya tiene una asignación activa.";
-                } elseif ($_GET['error'] == 'sin_campana') {
-                    echo "❌ No hay campañas activas para esta marca.";
                 } elseif ($_GET['error'] == 'db_error') {
                     echo "❌ Error en la base de datos.";
+                    if (isset($_GET['detalle'])) {
+                        echo "<br><small>" . urldecode($_GET['detalle']) . "</small>";
+                    }
                 } else {
                     echo "❌ Error al crear la asignación.";
                 }
@@ -181,6 +162,7 @@ $asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
         <section class="form-section">
             <h1>Gestión de Asignaciones</h1>
 
+            <!-- action apunta al controlador -->
             <form method="POST" action="../Controlador/engine_asignaciones.php">
                 
                 <!-- ===== COORDINADOR ===== -->
@@ -195,22 +177,21 @@ $asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
                     ?>
                 </select>
 
-                <!-- ===== MARCA ===== -->
-                <label>Marca</label>
-                <select name="marca_id" id="marca" required>
-                    <option value="" disabled selected>Seleccionar Marca</option>
+                <!-- ===== CAMPAÑA ===== -->
+                <label>Campaña</label>
+                <select name="id_campaña" required> <!-- El name del input sigue siendo id_campaña -->
+                    <option value="" disabled selected>Seleccionar Campaña</option>
                     <?php
-                    $stmt = $conn->query("SELECT id_marca, nombre FROM marcas WHERE estado='activa' ORDER BY nombre");
+                    $stmt = $conn->query("
+                        SELECT id_campaña, nombre_campaña 
+                        FROM campañas 
+                        WHERE estatus IN ('activa', 'pendiente', 'en_progreso')
+                        ORDER BY fecha_registro DESC
+                    ");
                     foreach ($stmt as $row) {
-                        echo "<option value='" . $row['id_marca'] . "'>" . htmlspecialchars($row['nombre']) . "</option>";
+                        echo "<option value='" . $row['id_campaña'] . "'>" . htmlspecialchars($row['nombre_campaña']) . "</option>";
                     }
                     ?>
-                </select>
-
-                <!-- ===== CAMPAÑA (AGREGADO) ===== -->
-                <label>Campaña</label>
-                <select name="id_campaña" id="campania" required>
-                    <option value="" disabled selected>Primero selecciona una marca</option>
                 </select>
 
                 <!-- ===== PERSONAL ===== -->
@@ -219,39 +200,23 @@ $asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
                     <option value="" disabled selected>Seleccionar Personal</option>
                     <?php
                     $stmt = $conn->query("
-                        SELECT p.id_personal, s.nombre, s.apellido_paterno, s.apellido_materno 
+                        SELECT p.id_personal, s.nombre, s.apellido_paterno, s.apellido_materno, cp.nombre_puesto
                         FROM personal p
                         JOIN solicitud s ON p.id_solicitud = s.id_solicitud
+                        LEFT JOIN cat_puestos cp ON s.id_puesto = cp.id_puesto
                         WHERE p.estatus_laboral = 'activo'
                         ORDER BY s.apellido_paterno
                     ");
                     foreach ($stmt as $row) {
                         $nombre_completo = $row['nombre'] . ' ' . $row['apellido_paterno'] . ' ' . $row['apellido_materno'];
-                        echo "<option value='" . $row['id_personal'] . "'>" . htmlspecialchars($nombre_completo) . "</option>";
+                        $puesto = $row['nombre_puesto'] ? ' (' . $row['nombre_puesto'] . ')' : '';
+                        echo "<option value='" . $row['id_personal'] . "'>" . htmlspecialchars($nombre_completo . $puesto) . "</option>";
                     }
                     ?>
                 </select>
 
                 <button type="submit">Asignar</button>
             </form>
-
-            <!-- ===== AJAX PARA CARGAR CAMPAÑAS ===== -->
-            <script>
-            $(document).ready(function() {
-                $('#marca').change(function() {
-                    var marca_id = $(this).val();
-                    
-                    $.ajax({
-                        url: '../Controladores/getCampaniasPorMarca.php',
-                        type: 'POST',
-                        data: { marca_id: marca_id },
-                        success: function(data) {
-                            $('select[name="id_campaña"]').html(data);
-                        }
-                    });
-                });
-            });
-            </script>
 
         </section>
 
@@ -272,36 +237,58 @@ $asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
                         <th>Nombre</th>
                         <th>Puesto</th>
                         <th>Coordinador</th>
-                        <th>Marca</th>
                         <th>Campaña</th>
                         <th>Fecha</th>
                         <th>Estatus</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (count($asignaciones) > 0): ?>
-                        <?php foreach ($asignaciones as $asig): 
+                    <?php
+                    $sql_asignaciones = "
+                        SELECT 
+                            a.id_asignacion,
+                            a.fecha_asignacion,
+                            a.estatus_asignacion,
+                            p.num_empleado,
+                            s.nombre,
+                            s.apellido_paterno,
+                            s.apellido_materno,
+                            cp.nombre_puesto,
+                            r.nombre AS responsable_nombre,
+                            c.nombre_campaña
+                        FROM asignaciones a
+                        INNER JOIN personal p ON a.id_personal = p.id_personal
+                        INNER JOIN solicitud s ON p.id_solicitud = s.id_solicitud
+                        LEFT JOIN cat_puestos cp ON s.id_puesto = cp.id_puesto
+                        INNER JOIN responsables r ON a.id_responsable = r.id_responsable
+                        INNER JOIN campañas c ON a.id_campaña = c.id_campaña
+                        ORDER BY a.fecha_asignacion DESC
+                        LIMIT 50
+                    ";
+                    
+                    $asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    if (count($asignaciones) > 0):
+                        foreach ($asignaciones as $asig): 
                             $nombre_completo = $asig['nombre'] . ' ' . $asig['apellido_paterno'] . ' ' . $asig['apellido_materno'];
-                        ?>
+                            $estatus_class = $asig['estatus_asignacion'] == 'activa' ? 'estatus-activa' : 'estatus-inactiva';
+                    ?>
                             <tr>
                                 <td><?php echo $asig['id_asignacion']; ?></td>
                                 <td><?php echo htmlspecialchars($asig['num_empleado'] ?? 'N/A'); ?></td>
                                 <td><?php echo htmlspecialchars($nombre_completo); ?></td>
                                 <td><?php echo htmlspecialchars($asig['nombre_puesto'] ?? 'Sin puesto'); ?></td>
                                 <td><?php echo htmlspecialchars($asig['responsable_nombre']); ?></td>
-                                <td><?php echo htmlspecialchars($asig['marca_nombre']); ?></td>
                                 <td><?php echo htmlspecialchars($asig['nombre_campaña']); ?></td>
                                 <td><?php echo date('d/m/Y', strtotime($asig['fecha_asignacion'])); ?></td>
-                                <td>
-                                    <span class="estatus-<?php echo $asig['estatus_asignacion']; ?>">
-                                        <?php echo ucfirst($asig['estatus_asignacion']); ?>
-                                    </span>
-                                </td>
+                                <td><span class="<?php echo $estatus_class; ?>"><?php echo ucfirst($asig['estatus_asignacion']); ?></span></td>
                             </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
+                    <?php 
+                        endforeach; 
+                    else: 
+                    ?>
                         <tr>
-                            <td colspan="9" style="text-align: center; padding: 30px;">
+                            <td colspan="8" style="text-align: center; padding: 30px;">
                                 No hay asignaciones registradas.
                             </td>
                         </tr>
@@ -312,7 +299,6 @@ $asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
     </main>
 
     <script>
-        // Búsqueda en tiempo real
         document.getElementById('searchAsignaciones')?.addEventListener('keyup', function() {
             var searchText = this.value.toLowerCase();
             var rows = document.querySelectorAll('tbody tr');

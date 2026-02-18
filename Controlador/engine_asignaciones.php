@@ -10,8 +10,13 @@ if (!isset($_SESSION['id_usuario'])) {
 
 // INCLUIR CONEXIÓN
 require_once '../Modelo/SupaConexion.php';
-$db = new SupaConexion();
-$conn = $db->getConexion();
+
+try {
+    $db = new SupaConexion();
+    $conn = $db->getConexion();
+} catch (Exception $e) {
+    die("Error de conexión: " . $e->getMessage());
+}
 
 // VERIFICAR QUE SE RECIBIERON DATOS POR POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -21,17 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // OBTENER DATOS DEL FORMULARIO
 $id_responsable = $_POST['id_responsable'] ?? '';
-$id_campaña = $_POST['id_campaña'] ?? '';
+$id_campana = $_POST['id_campaña'] ?? ''; // El input del form se llama id_campaña pero lo guardamos como id_campana
 $id_personal = $_POST['id_personal'] ?? '';
 
 // VALIDAR CAMPOS OBLIGATORIOS
-if (empty($id_responsable) || empty($id_campaña) || empty($id_personal)) {
+if (empty($id_responsable) || empty($id_campana) || empty($id_personal)) {
     header('Location: ../Vista/asignaciones.php?error=campos_vacios');
     exit();
 }
 
 try {
-    // 1. VERIFICAR SI EL PERSONAL YA ESTÁ ASIGNADO A UNA CAMPAÑA ACTIVA
+    $conn->beginTransaction();
+    
+    // Verificar si el personal ya está asignado
     $sql_check = "SELECT id_asignacion FROM asignaciones 
                   WHERE id_personal = :id_personal 
                   AND estatus_asignacion = 'activa'";
@@ -40,20 +47,21 @@ try {
     $stmt_check->execute();
     
     if ($stmt_check->rowCount() > 0) {
+        $conn->rollBack();
         header('Location: ../Vista/asignaciones.php?error=personal_ya_asignado');
         exit();
     }
     
-    // 2. INSERTAR ASIGNACIÓN
+    // Insertar asignación - USANDO id_campana SIN Ñ
     $sql = "INSERT INTO asignaciones (
                 id_personal,
-                id_campaña,
+                id_campaña,  -- La columna en BD tiene ñ, pero el parámetro NO
                 id_responsable,
                 fecha_asignacion,
                 estatus_asignacion
             ) VALUES (
                 :id_personal,
-                :id_campaña,
+                :id_campana,  -- Parámetro sin ñ
                 :id_responsable,
                 CURRENT_DATE,
                 'activa'
@@ -61,17 +69,21 @@ try {
     
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':id_personal', $id_personal);
-    $stmt->bindParam(':id_campaña', $id_campaña);
+    $stmt->bindParam(':id_campana', $id_campana); // Sin ñ
     $stmt->bindParam(':id_responsable', $id_responsable);
+    $stmt->execute();
     
-    if ($stmt->execute()) {
-        header('Location: ../Vista/asignaciones.php?success=asignacion_creada');
-    } else {
-        header('Location: ../Vista/asignaciones.php?error=error_guardar');
-    }
+    $conn->commit();
+    
+    header('Location: ../Vista/asignaciones.php?success=asignacion_creada');
+    exit();
     
 } catch (PDOException $e) {
-    header('Location: ../Vista/asignaciones.php?error=db_error');
+    if ($conn->inTransaction()) {
+        $conn->rollBack();
+    }
+    // Mostrar error detallado
+    header('Location: ../Vista/asignaciones.php?error=db_error&detalle=' . urlencode($e->getMessage()));
     exit();
 }
 ?>
