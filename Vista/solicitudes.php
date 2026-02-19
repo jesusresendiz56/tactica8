@@ -123,7 +123,9 @@ foreach ($solicitudes as $solicitud) {
                         <th>Disponibilidad</th>
                         <th>Estatus</th>
                         <th>Fecha de Solicitud</th>
-                        <th>Acciones</th>
+                        <th>Ver</th>
+                        <th>Aceptar</th>
+                        <th>Rechazar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -141,12 +143,13 @@ foreach ($solicitudes as $solicitud) {
                                 <td><?php echo $solicitud['disponibilidad']; ?></td>
                                 <td><span class="estado-badge <?php echo $clase_estado; ?>"><?php echo $estado_texto; ?></span></td>
                                 <td><?php echo $solicitud['fecha_solicitud']; ?></td>
-                                <td>
+                                <td class="accion-columna">
                                     <a href="ver_solicitud.php?id=<?php echo $solicitud['id']; ?>" 
                                        class="btn-accion btn-ver" title="Ver detalles">
                                         <img src="../src/imagenes/ver.png" alt="Ver" width="24" height="24">
                                     </a>
-
+                                </td>
+                                <td class="accion-columna">
                                     <?php if ($solicitud['estatus'] == 'pendiente'): ?>
                                         <a href="../Controlador/engine_procesar_solicitud.php?accion=aceptar&id=<?php echo $solicitud['id']; ?>" 
                                            class="btn-accion btn-aceptar" 
@@ -154,25 +157,54 @@ foreach ($solicitudes as $solicitud) {
                                            title="Aceptar solicitud">
                                             <img src="../src/imagenes/aceptar.png" alt="Aceptar" width="24" height="24">
                                         </a>
+                                    <?php else: ?>
+                                        <span class="accion-deshabilitada">-</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="accion-columna">
+                                    <?php if ($solicitud['estatus'] == 'pendiente'): ?>
                                         <a href="../Controlador/engine_procesar_solicitud.php?accion=rechazar&id=<?php echo $solicitud['id']; ?>" 
                                            class="btn-accion btn-rechazar" 
                                            onclick="return confirm('¿Rechazar esta solicitud?')" 
                                            title="Rechazar solicitud">
                                             <img src="../src/imagenes/rechazar.png" alt="Rechazar" width="24" height="24">
                                         </a>
+                                    <?php else: ?>
+                                        <span class="accion-deshabilitada">-</span>
                                     <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="8" style="text-align: center; padding: 20px;">No hay solicitudes de empleo registradas.</td>
+                            <td colspan="10" style="text-align: center; padding: 20px;">No hay solicitudes de empleo registradas.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </section>
     </main>
+
+    <style>
+        /* Estilos adicionales para las columnas de acciones */
+        .accion-columna {
+            text-align: center;
+            vertical-align: middle;
+            width: 50px;
+        }
+        .accion-deshabilitada {
+            color: #ccc;
+            font-weight: bold;
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+        }
+        table td {
+            padding: 8px 5px;
+        }
+    </style>
 
     <script>
         function filtrarTabla() {
@@ -207,4 +239,3 @@ foreach ($solicitudes as $solicitud) {
     </script>
 </body>
 </html>
-

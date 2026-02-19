@@ -169,7 +169,7 @@ $refs = $r->fetchAll(PDO::FETCH_ASSOC);
 </fieldset>
 
 <div class="acciones">
-    <button onclick="window.print()">🖨 Imprimir</button>
+    <button onclick="window.print()">Imprimir</button>
 </div>
 
 </div>
