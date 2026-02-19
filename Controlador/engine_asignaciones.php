@@ -2,88 +2,150 @@
 // Controlador/engine_asignaciones.php
 session_start();
 
-// VERIFICAR SESIÓN
+// Verificar sesión
 if (!isset($_SESSION['id_usuario'])) {
     header('Location: ../Vista/login.php?error=no_sesion');
     exit();
 }
 
-// INCLUIR CONEXIÓN
 require_once '../Modelo/SupaConexion.php';
 
 try {
     $db = new SupaConexion();
     $conn = $db->getConexion();
-} catch (Exception $e) {
-    die("Error de conexión: " . $e->getMessage());
-}
-
-// VERIFICAR QUE SE RECIBIERON DATOS POR POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../Vista/asignaciones.php?error=metodo_invalido');
-    exit();
-}
-
-// OBTENER DATOS DEL FORMULARIO
-$id_responsable = $_POST['id_responsable'] ?? '';
-$id_campana = $_POST['id_campaña'] ?? ''; // El input del form se llama id_campaña pero lo guardamos como id_campana
-$id_personal = $_POST['id_personal'] ?? '';
-
-// VALIDAR CAMPOS OBLIGATORIOS
-if (empty($id_responsable) || empty($id_campana) || empty($id_personal)) {
-    header('Location: ../Vista/asignaciones.php?error=campos_vacios');
-    exit();
-}
-
-try {
-    $conn->beginTransaction();
     
-    // Verificar si el personal ya está asignado
-    $sql_check = "SELECT id_asignacion FROM asignaciones 
-                  WHERE id_personal = :id_personal 
-                  AND estatus_asignacion = 'activa'";
-    $stmt_check = $conn->prepare($sql_check);
-    $stmt_check->bindParam(':id_personal', $id_personal);
-    $stmt_check->execute();
-    
-    if ($stmt_check->rowCount() > 0) {
-        $conn->rollBack();
-        header('Location: ../Vista/asignaciones.php?error=personal_ya_asignado');
+    // Validar campos
+    if (empty($_POST['id_responsable']) || empty($_POST['id_campaña']) || empty($_POST['id_personal'])) {
+        header('Location: ../Vista/asignaciones.php?error=campos_vacios');
         exit();
     }
     
-    // Insertar asignación - USANDO id_campana SIN Ñ
+    $id_responsable = $_POST['id_responsable'];
+    $id_campana = $_POST['id_campaña']; // SIN Ñ en la variable
+    $id_personal = $_POST['id_personal'];
+    $rol = $_POST['rol'] ?? 'personal_asignado';
+    
+    // VALIDACIÓN: Verificar que el personal no tenga asignaciones activas
+    $check_sql = "SELECT COUNT(*) as total 
+                  FROM asignaciones 
+                  WHERE id_personal = :id_personal 
+                  AND estatus_asignacion IN ('activa', 'en_progreso')";
+    
+    $check_stmt = $conn->prepare($check_sql);
+    $check_stmt->execute([':id_personal' => $id_personal]);
+    $result = $check_stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($result['total'] > 0) {
+        // Obtener información de la campaña activa actual
+        $info_sql = "SELECT c.nombre_campaña, m.nombre as marca_nombre, c.estatus
+                     FROM asignaciones a
+                     JOIN campañas c ON a.id_campaña = c.id_campaña
+                     JOIN marcas m ON c.marca_id = m.id_marca
+                     WHERE a.id_personal = :id_personal 
+                     AND a.estatus_asignacion IN ('activa', 'en_progreso')
+                     LIMIT 1";
+        
+        $info_stmt = $conn->prepare($info_sql);
+        $info_stmt->execute([':id_personal' => $id_personal]);
+        $info = $info_stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $mensaje = urlencode("El personal ya tiene una asignación {$info['estatus']} en: " . $info['nombre_campaña']);
+        header('Location: ../Vista/asignaciones.php?error=personal_ya_asignado&detalle=' . $mensaje);
+        exit();
+    }
+    
+    // Verificar que la campaña exista y esté activa
+    $check_campana = "SELECT c.*, m.nombre as marca_nombre 
+                     FROM campañas c
+                     INNER JOIN marcas m ON c.marca_id = m.id_marca
+                     WHERE c.id_campaña = :id_campana"; // SIN Ñ en el parámetro
+    
+    $stmt_campana = $conn->prepare($check_campana);
+    $stmt_campana->execute([':id_campana' => $id_campana]); // SIN Ñ
+    $campana = $stmt_campana->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$campana) {
+        header('Location: ../Vista/asignaciones.php?error=campana_inactiva&detalle=' . urlencode('La campaña no existe'));
+        exit();
+    }
+    
+    // Validar estatus permitidos
+    if (!in_array($campana['estatus'], ['activa', 'pendiente', 'en_progreso'])) {
+        header('Location: ../Vista/asignaciones.php?error=campana_inactiva&detalle=' . urlencode('La campaña está ' . $campana['estatus']));
+        exit();
+    }
+    
+    // Verificar fechas
+    $fecha_actual = date('Y-m-d');
+    if ($campana['fecha_fin'] && $campana['fecha_fin'] < $fecha_actual) {
+        header('Location: ../Vista/asignaciones.php?error=fechas_invalidas&detalle=' . urlencode('La campaña finalizó el ' . date('d/m/Y', strtotime($campana['fecha_fin']))));
+        exit();
+    }
+    
+    // Verificar que el personal esté activo
+    $check_personal = "SELECT p.*, s.nombre, s.apellido_paterno 
+                      FROM personal p
+                      INNER JOIN solicitud s ON p.id_solicitud = s.id_solicitud
+                      WHERE p.id_personal = :id_personal";
+    
+    $stmt_personal = $conn->prepare($check_personal);
+    $stmt_personal->execute([':id_personal' => $id_personal]);
+    $personal = $stmt_personal->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$personal || $personal['estatus_laboral'] !== 'activo') {
+        header('Location: ../Vista/asignaciones.php?error=personal_inactivo');
+        exit();
+    }
+    
+    // Insertar la asignación
     $sql = "INSERT INTO asignaciones (
-                id_personal,
-                id_campaña,  -- La columna en BD tiene ñ, pero el parámetro NO
-                id_responsable,
-                fecha_asignacion,
+                id_personal, 
+                id_campaña, 
+                id_responsable, 
+                rol, 
+                fecha_asignacion, 
+                fecha_inicio, 
                 estatus_asignacion
             ) VALUES (
-                :id_personal,
-                :id_campana,  -- Parámetro sin ñ
-                :id_responsable,
-                CURRENT_DATE,
-                'activa'
+                :id_personal, 
+                :id_campana,  -- SIN Ñ aquí también
+                :id_responsable, 
+                :rol, 
+                CURRENT_DATE, 
+                :fecha_inicio, 
+                'en_progreso'
             )";
     
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':id_personal', $id_personal);
-    $stmt->bindParam(':id_campana', $id_campana); // Sin ñ
-    $stmt->bindParam(':id_responsable', $id_responsable);
-    $stmt->execute();
+    $fecha_inicio = $fecha_actual;
+    if ($campana['fecha_inicio'] && $campana['fecha_inicio'] > $fecha_actual) {
+        $fecha_inicio = $campana['fecha_inicio'];
+    }
     
-    $conn->commit();
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([
+        ':id_personal' => $id_personal,
+        ':id_campana' => $id_campana, // SIN Ñ
+        ':id_responsable' => $id_responsable,
+        ':rol' => $rol,
+        ':fecha_inicio' => $fecha_inicio
+    ]);
+    
+    // Registrar log
+    $nombre_completo = $personal['nombre'] . ' ' . $personal['apellido_paterno'];
+    error_log("Asignación creada: {$nombre_completo} -> {$campana['nombre_campaña']}");
     
     header('Location: ../Vista/asignaciones.php?success=asignacion_creada');
     exit();
     
 } catch (PDOException $e) {
-    if ($conn->inTransaction()) {
-        $conn->rollBack();
+    error_log("Error en asignación: " . $e->getMessage());
+    
+    if ($e->errorInfo[1] == 1062) {
+        header('Location: ../Vista/asignaciones.php?error=personal_ya_asignado');
+    } else {
+        $detalle = urlencode($e->getMessage());
+        header('Location: ../Vista/asignaciones.php?error=db_error&detalle=' . $detalle);
     }
-    // Mostrar error detallado
-    header('Location: ../Vista/asignaciones.php?error=db_error&detalle=' . urlencode($e->getMessage()));
     exit();
 }
 ?>
