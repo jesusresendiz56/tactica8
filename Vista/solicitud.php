@@ -2,7 +2,7 @@
 session_start();
 require_once "../Modelo/SupaConexion.php";
 
-/* Obtener puestos desde la BD */
+//Puestos de la BD pra el select
 $stmt = $conn->query("
     SELECT id_puesto, nombre_puesto
     FROM cat_puestos
@@ -62,7 +62,7 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div>
                     <label>Salario deseado</label>
-                    <input type="number" name="salario_deseado" step="0.01">
+                    <input type="number" name="salario_deseado" step="0.01" required>
                 </div>
             </div>
         </fieldset>
@@ -72,14 +72,14 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <legend>Datos Personales</legend>
             <div class="grid-3">
                 <input type="text" name="apellido_paterno" placeholder="Apellido paterno" required>
-                <input type="text" name="apellido_materno" placeholder="Apellido materno">
+                <input type="text" name="apellido_materno" placeholder="Apellido materno" required>
                 <input type="text" name="nombre" placeholder="Nombre(s)" required>
             </div>
 
             <div class="grid-3">
-                <input type="date" name="fecha_nacimiento">
-                <input type="text" name="lugar_nacimiento" placeholder="Lugar de nacimiento">
-                <select name="sexo">
+                <input type="date" name="fecha_nacimiento" placeholder="Fecha de nacimiento" required max="2006-02-19">
+                <input type="text" name="lugar_nacimiento" placeholder="Lugar de nacimiento" required>
+                <select name="sexo" required>
                     <option value="">Sexo</option>
                     <option value="masculino">Masculino</option>
                     <option value="femenino">Femenino</option>
@@ -88,14 +88,14 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
 
             <div class="grid-3">
-                <input type="number" name="celular" placeholder="Celular">
-                <input type="number" name="telefono_casa" placeholder="Teléfono de casa">
-                <input type="number" name="telefono_recados" placeholder="Teléfono de recados">
+                <input type="number" name="celular" placeholder="Celular" required>
+                <input type="number" name="telefono_casa" placeholder="Teléfono de casa" required>
+                <input type="number" name="telefono_recados" placeholder="Teléfono de recados" required>
             </div>
 
             <div class="grid-2">
                 <input type="email" name="correo" placeholder="Correo electrónico" required>
-                <select name="estado_civil">
+                <select name="estado_civil" required>
                     <option value="">Estado civil</option>
                     <option value="soltero">Soltero(a)</option>
                     <option value="casado">Casado(a)</option>
@@ -107,7 +107,7 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="grid-2">
                 <label>Tipo de sangre</label>
-                <select name="tipo_sangre">
+                <select name="tipo_sangre" required>
                     <option value="">Seleccionar</option>
                     <option value="O+">O+</option>
                     <option value="O-">O-</option>
@@ -122,13 +122,13 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="grid-2">
                 <label>¿Crédito Infonavit?</label>
-                <select name="credito_infonavit">
+                <select name="credito_infonavit" required>
                     <option value="">Seleccionar</option>
                     <option value="TRUE">Sí</option>
                     <option value="FALSE">No</option>
                 </select>
                 <label>¿Crédito Fonacot?</label>
-                <select name="credito_fonacot">
+                <select name="credito_fonacot" required>
                     <option value="">Seleccionar</option>
                     <option value="TRUE">Sí</option>
                     <option value="FALSE">No</option>
@@ -140,14 +140,14 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <fieldset>
             <legend>Dirección</legend>
             <div class="grid-3">
-                <input type="text" name="calle" placeholder="Calle y Numero">
-                <input type="text" name="colonia" placeholder="Colonia">
-                <input type="text" name="cp" placeholder="Código postal">
+                <input type="text" name="calle" placeholder="Calle y Numero" required>
+                <input type="text" name="colonia" placeholder="Colonia" required>
+                <input type="text" name="cp" placeholder="Código postal" required>
             </div>
             <div class="grid-3">
-                <input type="text" name="ciudad" placeholder="Ciudad">
-                <input type="text" name="municipio" placeholder="Municipio">
-                <input type="text" name="estado" placeholder="Estado">
+                <input type="text" name="ciudad" placeholder="Ciudad" required>
+                <input type="text" name="municipio" placeholder="Municipio" required>
+                <input type="text" name="estado" placeholder="Estado" required>
             </div>
         </fieldset>
 
@@ -155,10 +155,19 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <fieldset>
             <legend>Documentos</legend>
             <div class="grid-4">
-                <input type="text" name="rfc" placeholder="RFC">
-                <input type="text" name="curp" placeholder="CURP">
-                <input type="number" name="imss" placeholder="IMSS">
-                <input type="text" name="grado_estudios" placeholder="Grado de estudios">
+                <input type="text" name="rfc" placeholder="RFC (13 caracteres máx.)" maxlength="13" pattern="[A-Za-z0-9]{1,13}" title="Solo letras y números, máximo 13 caracteres" required>
+                <input type="text" name="curp" placeholder="CURP (18 caracteres)" maxlength="18" minlength="18" pattern="[A-Za-z0-9]{18}" title="Debe tener exactamente 18 caracteres alfanuméricos" required>
+                <input type="number" name="imss" placeholder="IMSS (11 dígitos)" min="10000000000" max="99999999999" step="1" oninput="this.value=this.value.slice(0,11)" title="Debe tener exactamente 11 dígitos" required>
+                <select name="grado_estudios" required>
+                    <option value="">Grado de estudios</option>
+                    <option value="Primaria">Primaria</option>
+                    <option value="Secundaria">Secundaria</option>
+                    <option value="Preparatoria">Preparatoria</option>
+                    <option value="Técnico">Técnico</option>
+                    <option value="Licenciatura">Licenciatura</option>
+                    <option value="Maestría">Maestría</option>
+                    <option value="Doctorado">Doctorado</option>
+                </select>
             </div>
         </fieldset>
 
@@ -166,12 +175,12 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <fieldset>
             <legend>Datos Familiares</legend>
             <div class="grid-3">
-                <input type="text" name="nombre_padre" placeholder="Nombre del padre">
-                <input type="text" name="nombre_madre" placeholder="Nombre de la madre">
-                <input type="number" name="numero_hijos" placeholder="Número de hijos">
+                <input type="text" name="nombre_padre" placeholder="Nombre del padre" required>
+                <input type="text" name="nombre_madre" placeholder="Nombre de la madre" required>
+                <input type="number" name="numero_hijos" placeholder="Número de hijos" min="0" required>
             </div>
             <div class="grid-1">
-                <input type="text" name="quien_los_cuida" placeholder="Quién los cuida">
+                <input type="text" name="quien_los_cuida" placeholder="Quién los cuida" required>
             </div>
         </fieldset>
 
@@ -179,14 +188,14 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <fieldset>
             <legend>Referencias Personales</legend>
             <div class="referencia">
-                <input type="text" name="ref_nombre[]" placeholder="Nombre">
-                <input type="text" name="ref_parentesco[]" placeholder="Parentesco">
-                <input type="number" name="ref_telefono[]" placeholder="Teléfono">
+                <input type="text" name="ref_nombre[]" placeholder="Nombre" required>
+                <input type="text" name="ref_parentesco[]" placeholder="Parentesco" required>
+                <input type="number" name="ref_telefono[]" placeholder="Teléfono" required>
             </div>
             <div class="referencia">
-                <input type="text" name="ref_nombre[]" placeholder="Nombre">
-                <input type="text" name="ref_parentesco[]" placeholder="Parentesco">
-                <input type="number" name="ref_telefono[]" placeholder="Teléfono">
+                <input type="text" name="ref_nombre[]" placeholder="Nombre" required>
+                <input type="text" name="ref_parentesco[]" placeholder="Parentesco" required>
+                <input type="number" name="ref_telefono[]" placeholder="Teléfono" required>
             </div>
         </fieldset>
 
@@ -209,5 +218,4 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 </body>
 </html>
-
 

@@ -20,7 +20,7 @@ try {
     $db = new SupaConexion();
     $conn = $db->getConexion();
 
-    // 🔹 Obtener datos del solicitante (NO modifica tu lógica)
+    // 🔹 Obtener datos del solicitante 
     $sqlDatos = "SELECT nombre, 
                         COALESCE(celular, telefono_casa, telefono_recados) AS telefono
                  FROM solicitud

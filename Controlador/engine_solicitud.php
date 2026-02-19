@@ -133,14 +133,11 @@ try {
     }
 
     $conn->commit();
-    $_SESSION['solicitud_exito'] = "✅ Solicitud enviada correctamente.";
+    $_SESSION['solicitud_exito'] = "Solicitud enviada correctamente.";
 
 } catch (Exception $e) {
     $conn->rollBack();
-    $_SESSION['solicitud_errores'] = [
-        "❌ Error al guardar la solicitud",
-        $e->getMessage()
-    ];
+    $_SESSION['solicitud_errores'] = ["Error al enviar la solicitud"];
 }
 
 header("Location: ../Vista/solicitud.php");
