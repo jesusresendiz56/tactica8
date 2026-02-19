@@ -180,7 +180,7 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <input type="number" name="numero_hijos" placeholder="Número de hijos" min="0" required>
             </div>
             <div class="grid-1">
-                <input type="text" name="quien_los_cuida" placeholder="Quién los cuida" required>
+                <input type="text" name="quien_los_cuida" placeholder="Quién los cuida">
             </div>
         </fieldset>
 
