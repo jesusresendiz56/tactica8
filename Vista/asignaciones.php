@@ -130,6 +130,11 @@ try {
             background: #28a745;
             color: white;
         }
+        .loading {
+            color: #666;
+            font-style: italic;
+            padding: 5px;
+        }
     </style>
 </head>
 
@@ -234,7 +239,7 @@ try {
                 
                 <!-- ===== COORDINADOR ===== -->
                 <label>Coordinador <span style="color: #999; font-size: 12px;">(Responsable de la asignación)</span></label>
-                <select name="id_responsable" required>
+                <select name="id_responsable" id="id_responsable" required onchange="cargarCampanasPorCoordinador(this.value)">
                     <option value="" disabled selected>Seleccionar Coordinador</option>
                     <?php
                     $stmt = $conn->query("SELECT id_responsable, nombre, puesto FROM responsables WHERE estado='activo' ORDER BY nombre");
@@ -245,91 +250,25 @@ try {
                 </select>
 
                 <!-- ===== CAMPAÑA ===== -->
-                <label>Campaña <span style="color: #999; font-size: 12px;">(Campañas activas, en progreso o pendientes)</span></label>
+                <label>Campaña <span style="color: #999; font-size: 12px;">(Solo campañas del coordinador seleccionado)</span></label>
                 <select name="id_campaña" id="id_campaña" required>
-                    <option value="" disabled selected>Seleccionar Campaña</option>
-                    <?php
-                    $stmt = $conn->query("
-                        SELECT 
-                            c.id_campaña, 
-                            c.nombre_campaña,
-                            c.fecha_inicio,
-                            c.fecha_fin,
-                            c.estatus,
-                            m.nombre AS marca_nombre,
-                            tc.nombre AS tipo_campaña,
-                            r.nombre AS responsable_nombre
-                        FROM campañas c
-                        INNER JOIN marcas m ON c.marca_id = m.id_marca
-                        INNER JOIN tipos_campaña tc ON c.tipo_campaña_id = tc.id_tipo
-                        INNER JOIN responsables r ON c.responsable_id = r.id_responsable
-                        WHERE c.estatus IN ('activa', 'pendiente', 'en_progreso')
-                        ORDER BY 
-                            CASE 
-                                WHEN c.estatus = 'en_progreso' THEN 1
-                                WHEN c.estatus = 'activa' THEN 2
-                                WHEN c.estatus = 'pendiente' THEN 3
-                                ELSE 4
-                            END,
-                            c.fecha_registro DESC
-                    ");
-                    
-                    $campañas_disponibles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    
-                    if (count($campañas_disponibles) > 0):
-                        foreach ($campañas_disponibles as $row):
-                            $fechas = '';
-                            if ($row['fecha_inicio']) {
-                                $fechas .= ' Inicio: ' . date('d/m/Y', strtotime($row['fecha_inicio']));
-                            }
-                            if ($row['fecha_fin']) {
-                                $fechas .= ' - Fin: ' . date('d/m/Y', strtotime($row['fecha_fin']));
-                            }
-                            
-                            $info_extra = $row['marca_nombre'] . ' | ' . $row['tipo_campaña'];
-                            
-                            echo "<option value='" . $row['id_campaña'] . "'>" 
-                                . htmlspecialchars($row['nombre_campaña']) 
-                                . " (" . htmlspecialchars($info_extra) . ")"
-                                . " - [" . ucfirst($row['estatus']) . "]"
-                                . ($fechas ? " - " . $fechas : "")
-                                . " - Resp: " . htmlspecialchars($row['responsable_nombre'])
-                                . "</option>";
-                        endforeach;
-                    else:
-                        echo "<option value='' disabled>No hay campañas disponibles</option>";
-                    endif;
-                    ?>
+                    <option value="" disabled selected>Primero selecciona un coordinador</option>
                 </select>
 
-                <!-- Mostrar resumen de campañas -->
-                <?php if (count($campañas_disponibles) > 0): 
-                    $count_en_progreso = 0;
-                    $count_pendiente = 0;
-                    $count_activa = 0;
-                    foreach ($campañas_disponibles as $c) {
-                        if ($c['estatus'] == 'en_progreso') $count_en_progreso++;
-                        if ($c['estatus'] == 'pendiente') $count_pendiente++;
-                        if ($c['estatus'] == 'activa') $count_activa++;
-                    }
-                ?>
-                <div style="font-size: 12px; color: #666; margin-top: 5px; margin-bottom: 15px; display: flex; gap: 15px;">
-                    <span>📊 Campañas disponibles:</span>
-                    <?php if ($count_en_progreso > 0): ?>
-                        <span class="badge badge-en_progreso">🔵 <?php echo $count_en_progreso; ?> en progreso</span>
-                    <?php endif; ?>
-                    <?php if ($count_activa > 0): ?>
-                        <span class="badge badge-activa">🟢 <?php echo $count_activa; ?> activas</span>
-                    <?php endif; ?>
-                    <?php if ($count_pendiente > 0): ?>
-                        <span class="badge badge-pendiente">🟡 <?php echo $count_pendiente; ?> pendientes</span>
-                    <?php endif; ?>
+                <!-- Mostrar resumen de campañas (se actualiza vía JS) -->
+                <div id="campana_resumen" style="font-size: 12px; color: #666; margin-top: 5px; margin-bottom: 15px; display: none;">
+                    <span>📊 Cargando campañas...</span>
                 </div>
-                <?php endif; ?>
+
+                <!-- Información de la campaña seleccionada -->
+                <div id="campana_info" style="background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 3px; border-left: 3px solid #007bff; display: none;">
+                    <strong>📋 Detalles de la campaña:</strong>
+                    <div id="campana_detalles"></div>
+                </div>
 
                 <!-- ===== PERSONAL ===== -->
                 <label>Personal <span style="color: #999; font-size: 12px;">(Solo personal sin asignaciones activas)</span></label>
-                <select name="id_personal" required>
+                <select name="id_personal" id="id_personal" required>
                     <option value="" disabled selected>Seleccionar Personal</option>
                     <?php
                     // Solo mostrar personal que NO tiene asignaciones activas
@@ -380,7 +319,7 @@ try {
                     </div>
                 <?php endif; ?>
 
-                <button type="submit" <?php echo (count($personal_disponible) == 0) ? 'disabled' : ''; ?>>
+                <button type="submit" id="btn-submit" <?php echo (count($personal_disponible) == 0) ? 'disabled' : ''; ?>>
                     Asignar Personal a Campaña
                 </button>
             </form>
@@ -501,13 +440,104 @@ try {
     </main>
 
     <script>
-        document.getElementById('searchAsignaciones')?.addEventListener('keyup', function() {
-            filtrarTabla();
+        // Función para cargar campañas por coordinador usando AJAX
+        function cargarCampanasPorCoordinador(idResponsable) {
+            const campanaSelect = document.getElementById('id_campaña');
+            const campanaResumen = document.getElementById('campana_resumen');
+            const campanaInfo = document.getElementById('campana_info');
+            const btnSubmit = document.getElementById('btn-submit');
+            
+            // Validar que el ID sea válido
+            if (!idResponsable || idResponsable === '' || idResponsable === 'null' || idResponsable === 'undefined') {
+                campanaSelect.innerHTML = '<option value="" disabled selected>Primero selecciona un coordinador</option>';
+                campanaResumen.style.display = 'none';
+                campanaInfo.style.display = 'none';
+                return;
+            }
+            
+            // Mostrar loading
+            campanaSelect.innerHTML = '<option value="" disabled selected>Cargando campañas...</option>';
+            campanaResumen.style.display = 'block';
+            campanaResumen.innerHTML = '<span class="loading">📊 Cargando campañas del coordinador...</span>';
+            campanaInfo.style.display = 'none';
+            
+            // Hacer petición AJAX
+            fetch('../Controlador/get_campanas_por_coordinador.php?id_responsable=' + encodeURIComponent(idResponsable))
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        campanaSelect.innerHTML = '<option value="" disabled selected>Error al cargar campañas</option>';
+                        campanaResumen.innerHTML = '<span style="color: #dc3545;">❌ ' + data.error + '</span>';
+                        return;
+                    }
+                    
+                    if (data.campanas.length === 0) {
+                        campanaSelect.innerHTML = '<option value="" disabled selected>No hay campañas disponibles para este coordinador</option>';
+                        campanaResumen.innerHTML = '<span>📊 No hay campañas activas, en progreso o pendientes para este coordinador</span>';
+                        return;
+                    }
+                    
+                    // Construir opciones
+                    let options = '<option value="" disabled selected>Seleccionar Campaña</option>';
+                    let count_en_progreso = 0;
+                    let count_pendiente = 0;
+                    let count_activa = 0;
+                    
+                    data.campanas.forEach(c => {
+                        let fechas = '';
+                        if (c.fecha_inicio) fechas += ' Inicio: ' + c.fecha_inicio;
+                        if (c.fecha_fin) fechas += ' - Fin: ' + c.fecha_fin;
+                        
+                        options += `<option value="${c.id_campaña}" data-estatus="${c.estatus}">` +
+                            `${c.nombre_campaña} (${c.marca_nombre} | ${c.tipo_campaña}) - [${c.estatus}]` +
+                            (fechas ? ' - ' + fechas : '') +
+                            ` - Resp: ${c.responsable_nombre}</option>`;
+                        
+                        if (c.estatus === 'en_progreso') count_en_progreso++;
+                        if (c.estatus === 'pendiente') count_pendiente++;
+                        if (c.estatus === 'activa') count_activa++;
+                    });
+                    
+                    campanaSelect.innerHTML = options;
+                    
+                    // Actualizar resumen
+                    let resumenHtml = '📊 Campañas disponibles: ';
+                    if (count_en_progreso > 0) resumenHtml += `<span class="badge badge-en_progreso">🔵 ${count_en_progreso} en progreso</span> `;
+                    if (count_activa > 0) resumenHtml += `<span class="badge badge-activa">🟢 ${count_activa} activas</span> `;
+                    if (count_pendiente > 0) resumenHtml += `<span class="badge badge-pendiente">🟡 ${count_pendiente} pendientes</span> `;
+                    
+                    campanaResumen.innerHTML = resumenHtml;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    campanaSelect.innerHTML = '<option value="" disabled selected>Error al cargar campañas</option>';
+                    campanaResumen.innerHTML = '<span style="color: #dc3545;">❌ Error de conexión: ' + error.message + '</span>';
+                });
+        }
+
+        // Mostrar información de la campaña seleccionada
+        document.getElementById('id_campaña')?.addEventListener('change', function() {
+            var selectedOption = this.options[this.selectedIndex];
+            var infoDiv = document.getElementById('campana_info');
+            var detallesDiv = document.getElementById('campana_detalles');
+            
+            if (this.value) {
+                var textParts = selectedOption.text.split(' - ');
+                infoDiv.style.display = 'block';
+                detallesDiv.innerHTML = '<strong>' + textParts[0] + '</strong><br>' + textParts.slice(1).join('<br>');
+            } else {
+                infoDiv.style.display = 'none';
+            }
         });
 
-        document.getElementById('filtro_estatus')?.addEventListener('change', function() {
-            filtrarTabla();
-        });
+        // Filtros de tabla
+        document.getElementById('searchAsignaciones')?.addEventListener('keyup', filtrarTabla);
+        document.getElementById('filtro_estatus')?.addEventListener('change', filtrarTabla);
 
         function filtrarTabla() {
             var searchText = document.getElementById('searchAsignaciones').value.toLowerCase();
