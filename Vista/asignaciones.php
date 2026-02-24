@@ -86,7 +86,7 @@ try {
         <!-- MESSAGES -->
         <?php if (isset($_GET['success']) && $_GET['success'] == 'asignacion_creada'): ?>
             <div class="alert-success">
-                ✅ Asignación creada exitosamente.
+            Asignación creada .
             </div>
         <?php endif; ?>
 
@@ -131,7 +131,7 @@ try {
             <form method="POST" action="../Controlador/engine_asignaciones.php">
                 
                 <!-- ===== COORDINADOR ===== -->
-                <label>Coordinador <span style="color: #999; font-size: 12px;">(Responsable de la asignación)</span></label>
+                <label>Coordinador <span style="color: #999; font-size: 12px;">(Responsable)</span></label>
                 <select name="id_responsable" id="id_responsable" required onchange="cargarCampanasPorCoordinador(this.value)">
                     <option value="" disabled selected>Seleccionar Coordinador</option>
                     <?php
@@ -143,24 +143,24 @@ try {
                 </select>
 
                 <!-- ===== CAMPAÑA ===== -->
-                <label>Campaña <span style="color: #999; font-size: 12px;">(Solo campañas del coordinador seleccionado)</span></label>
+                <label>Campaña <span style="color: #999; font-size: 12px;">(Campañas del coordinador seleccionado)</span></label>
                 <select name="id_campaña" id="id_campaña" required>
-                    <option value="" disabled selected>Primero selecciona un coordinador</option>
+                    <option value="" disabled selected>Selecciona un coordinador</option>
                 </select>
 
                 <!-- Mostrar resumen de campañas (se actualiza vía JS) -->
                 <div id="campana_resumen" style="font-size: 12px; color: #666; margin-top: 5px; margin-bottom: 15px; display: none;">
-                    <span>📊 Cargando campañas...</span>
+                    <span>Cargando campañas...</span>
                 </div>
 
                 <!-- Información de la campaña seleccionada -->
                 <div id="campana_info" style="background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 3px; border-left: 3px solid #007bff; display: none;">
-                    <strong>📋 Detalles de la campaña:</strong>
+                    <strong>Detalles de la campaña:</strong>
                     <div id="campana_detalles"></div>
                 </div>
 
                 <!-- ===== PERSONAL ===== -->
-                <label>Personal <span style="color: #999; font-size: 12px;">(Solo personal sin asignaciones activas)</span></label>
+                <label>Personal <span style="color: #999; font-size: 12px;">(Solo personal disponible)</span></label>
                 <select name="id_personal" id="id_personal" required>
                     <option value="" disabled selected>Seleccionar Personal</option>
                     <?php
@@ -208,7 +208,7 @@ try {
                 <!-- Mensaje si no hay personal disponible -->
                 <?php if (count($personal_disponible) == 0): ?>
                     <div class="alert-warning" style="margin-top: 10px;">
-                        ⚠️ No hay personal disponible en este momento. Todos los empleados activos ya están asignados a campañas.
+                        No hay personal disponible en este momento. Todos los empleados activos ya están asignados a campañas.
                     </div>
                 <?php endif; ?>
 
@@ -351,7 +351,7 @@ try {
             // Mostrar loading
             campanaSelect.innerHTML = '<option value="" disabled selected>Cargando campañas...</option>';
             campanaResumen.style.display = 'block';
-            campanaResumen.innerHTML = '<span class="loading">📊 Cargando campañas del coordinador...</span>';
+            campanaResumen.innerHTML = '<span class="loading">Cargando campañas del coordinador...</span>';
             campanaInfo.style.display = 'none';
             
             // Hacer petición AJAX
@@ -371,7 +371,7 @@ try {
                     
                     if (data.campanas.length === 0) {
                         campanaSelect.innerHTML = '<option value="" disabled selected>No hay campañas disponibles para este coordinador</option>';
-                        campanaResumen.innerHTML = '<span>📊 No hay campañas activas, en progreso o pendientes para este coordinador</span>';
+                        campanaResumen.innerHTML = '<span>No hay campañas activas, en progreso o pendientes para este coordinador</span>';
                         return;
                     }
                     
@@ -399,7 +399,7 @@ try {
                     campanaSelect.innerHTML = options;
                     
                     // Actualizar resumen
-                    let resumenHtml = '📊 Campañas disponibles: ';
+                    let resumenHtml = 'Campañas disponibles: ';
                     if (count_en_progreso > 0) resumenHtml += `<span class="badge badge-en_progreso">🔵 ${count_en_progreso} en progreso</span> `;
                     if (count_activa > 0) resumenHtml += `<span class="badge badge-activa">🟢 ${count_activa} activas</span> `;
                     if (count_pendiente > 0) resumenHtml += `<span class="badge badge-pendiente">🟡 ${count_pendiente} pendientes</span> `;
@@ -409,7 +409,7 @@ try {
                 .catch(error => {
                     console.error('Error:', error);
                     campanaSelect.innerHTML = '<option value="" disabled selected>Error al cargar campañas</option>';
-                    campanaResumen.innerHTML = '<span style="color: #dc3545;">❌ Error de conexión: ' + error.message + '</span>';
+                    campanaResumen.innerHTML = '<span style="color: #dc3545;">Error de conexión: ' + error.message + '</span>';
                 });
         }
 
