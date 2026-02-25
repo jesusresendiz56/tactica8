@@ -4,7 +4,7 @@ session_start();
 
 // VERIFICACIÓN DE SESIÓN
 if (!isset($_SESSION['id_usuario'])) {
-    header('Location: login.php?error=no_sesion');
+    header('Location: ../vista/login.php?error=no_sesion');
     exit();
 }
 
