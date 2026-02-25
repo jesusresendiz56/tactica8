@@ -1,5 +1,4 @@
 <?php
-// Modelo/SupaConexion.php - VERSIÓN CON CLASE
 class SupaConexion {
     private $host = "aws-0-us-west-2.pooler.supabase.com";
     private $dbname = "postgres";
@@ -20,7 +19,7 @@ class SupaConexion {
             echo "";
             
         } catch (PDOException $e) {
-            echo "❌ Error de conexión: " . $e->getMessage();
+            echo "Error de conexión: " . $e->getMessage();
             die();
         }
     }

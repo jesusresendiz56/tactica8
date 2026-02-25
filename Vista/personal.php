@@ -1,22 +1,30 @@
 <?php
 session_start();
 
-// VERIFICACIÓN DE SESIÓN
+/* ==============================
+   1️⃣ VERIFICAR SESIÓN
+============================== */
 if (!isset($_SESSION['id_usuario'])) {
     header('Location: login.php?error=no_sesion');
     exit();
 }
 
-// INCLUIR CONEXIÓN
+/* ==============================
+   2️⃣ CONEXIÓN
+============================== */
 require_once '../Modelo/SupaConexion.php';
 $db = new SupaConexion();
 $conn = $db->getConexion();
 
-// Obtener información del usuario
-$usuario_nombre = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Administrador';
-$usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmail.com';
+/* ==============================
+   3️⃣ DATOS USUARIO
+============================== */
+$usuario_nombre = $_SESSION['usuario_nombre'] ?? 'Administrador';
+$usuario_correo = $_SESSION['correo'] ?? 'admin@gmail.com';
 
-// Obtener personal
+/* ==============================
+   4️⃣ CONSULTA CON ESTATUS ASIGNACIÓN
+============================== */
 $sql = "
     SELECT 
         p.id_personal,
@@ -28,25 +36,32 @@ $sql = "
         s.nombre,
         s.apellido_paterno,
         s.apellido_materno,
-        s.id_puesto,
-        cp.nombre_puesto
+        cp.nombre_puesto,
+        a.estatus_asignacion
     FROM personal p
     LEFT JOIN solicitud s ON p.id_solicitud = s.id_solicitud
     LEFT JOIN cat_puestos cp ON s.id_puesto = cp.id_puesto
+    LEFT JOIN asignaciones a 
+        ON p.id_personal = a.id_personal 
+        AND a.estatus_asignacion IN ('activa','en_progreso')
     ORDER BY p.fecha_alta DESC
 ";
 
 $stmt = $conn->query($sql);
 $personal = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Contadores
+/* ==============================
+   5️⃣ CONTADORES
+============================== */
 $activos = 0;
 $inactivos = 0;
+$en_proceso = 0;
+
 foreach ($personal as $empleado) {
-    if ($empleado['estatus_laboral'] == 'activo') {
-        $activos++;
-    } else {
-        $inactivos++;
+    switch ($empleado['estatus_laboral']) {
+        case 'activo': $activos++; break;
+        case 'en_proceso': $en_proceso++; break;
+        default: $inactivos++; break;
     }
 }
 ?>
@@ -56,9 +71,6 @@ foreach ($personal as $empleado) {
 <meta charset="UTF-8">
 <title>Personal | TÁCTICA 8</title>
 <link rel="stylesheet" href="../src/estilos/estilos.css">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 </head>
 
 <body>
@@ -66,11 +78,7 @@ foreach ($personal as $empleado) {
 <header class="header">
 <div class="header-logo">
 <a href="dashboard.php">
-<img src="../src/imagenes/tactica_logo.png"
-alt="TÁCTICA 8"
-class="logo-img"
-width="100"
-height="100">
+<img src="../src/imagenes/tactica_logo.png" width="100" height="100">
 </a>
 </div>
 
@@ -80,22 +88,16 @@ Más de 40 años de experiencia.
 </div>
 
 <div class="header-exit">
-<div class="user-info" style="margin-right: 15px; text-align: right;">
-<span class="user-name" style="display: block; color: white; font-weight: bold;">
+<div style="margin-right:15px;text-align:right;">
+<span style="display:block;color:white;font-weight:bold;">
 <?php echo htmlspecialchars($usuario_nombre); ?>
 </span>
-<span class="user-email" style="display: block; color: white; font-size: 12px; opacity: 0.8;">
+<span style="display:block;color:white;font-size:12px;opacity:0.8;">
 <?php echo htmlspecialchars($usuario_correo); ?>
 </span>
 </div>
-<a href="../Controlador/logout.php"
-onclick="return confirm('¿Estás seguro de cerrar sesión?')"
-title="Cerrar Sesión">
-<img src="../src/imagenes/logout.png"
-alt="Salir"
-class="exit-icon"
-width="30"
-height="30">
+<a href="../Controlador/logout.php" onclick="return confirm('¿Cerrar sesión?')">
+<img src="../src/imagenes/logout.png" width="30" height="30">
 </a>
 </div>
 </header>
@@ -111,42 +113,36 @@ height="30">
 
 <main class="content">
 
-<?php if (isset($_GET['success']) && $_GET['success'] == 'nuevo_personal'): ?>
-<div style="background-color: #d4edda; color: #155724; padding: 15px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #c3e6cb;">
-✅ Personal agregado exitosamente desde solicitudes.
-</div>
-<?php endif; ?>
-
 <section class="form-section">
 <h1>Gestión de Personal</h1>
 
-<div style="display: flex; gap: 20px; margin-bottom: 30px;">
-<div style="background: #e3f2fd; padding: 15px; border-radius: 5px; border-left: 5px solid #2196f3;">
-<span style="font-size: 24px; font-weight: bold;"><?php echo count($personal); ?></span>
-<span style="display: block; color: #666;">Total Personal</span>
+<div style="display:flex; gap:20px; margin-bottom:30px;">
+
+<div style="background:#e3f2fd;padding:15px;border-left:5px solid #2196f3;">
+<span style="font-size:24px;font-weight:bold;"><?php echo count($personal); ?></span>
+<span style="display:block;color:#666;">Total</span>
 </div>
 
-<div style="background: #e8f5e9; padding: 15px; border-radius: 5px; border-left: 5px solid #4caf50;">
-<span style="font-size: 24px; font-weight: bold;"><?php echo $activos; ?></span>
-<span style="display: block; color: #666;">Activos</span>
+<div style="background:#e8f5e9;padding:15px;border-left:5px solid #4caf50;">
+<span style="font-size:24px;font-weight:bold;"><?php echo $activos; ?></span>
+<span style="display:block;color:#666;">Activos</span>
 </div>
 
-<div style="background: #ffebee; padding: 15px; border-radius: 5px; border-left: 5px solid #f44336;">
-<span style="font-size: 24px; font-weight: bold;"><?php echo $inactivos; ?></span>
-<span style="display: block; color: #666;">Inactivos</span>
-</div>
+<div style="background:#fff8e1;padding:15px;border-left:5px solid #ff9800;">
+<span style="font-size:24px;font-weight:bold;"><?php echo $en_proceso; ?></span>
+<span style="display:block;color:#666;">En Proceso</span>
 </div>
 
+<div style="background:#ffebee;padding:15px;border-left:5px solid #f44336;">
+<span style="font-size:24px;font-weight:bold;"><?php echo $inactivos; ?></span>
+<span style="display:block;color:#666;">Inactivos</span>
+</div>
+
+</div>
 </section>
 
 <section class="table-section">
 <h2>Personal Existente</h2>
-
-<div style="margin-bottom: 20px;">
-<input type="search" id="searchPersonal"
-placeholder="Buscar por nombre o puesto..."
-style="padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 3px;">
-</div>
 
 <table>
 <thead>
@@ -154,52 +150,85 @@ style="padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 3px;"
 <th>No. Empleado</th>
 <th>Nombre</th>
 <th>Puesto</th>
-<th>Estatus</th>
+<th>Estatus Laboral</th>
+<th>Estatus Asignación</th>
 <th>Fecha Alta</th>
 <th>Contrato</th>
 </tr>
 </thead>
+
 <tbody>
 
-<?php if (count($personal) > 0): ?>
 <?php foreach ($personal as $empleado):
+
 $nombre_completo = trim(
 ($empleado['nombre'] ?? '') . ' ' .
 ($empleado['apellido_paterno'] ?? '') . ' ' .
 ($empleado['apellido_materno'] ?? '')
 );
+
+/* Colores */
+$color_laboral = '#f44336';
+if ($empleado['estatus_laboral'] == 'activo') $color_laboral = '#4caf50';
+if ($empleado['estatus_laboral'] == 'en_proceso') $color_laboral = '#ff9800';
+
+$estatus_asig = $empleado['estatus_asignacion'] ?? null;
+$color_asig = '#999';
+if ($estatus_asig == 'activa') $color_asig = '#4caf50';
+if ($estatus_asig == 'en_progreso') $color_asig = '#ff9800';
 ?>
+
 <tr>
 
 <td>
-<?php echo htmlspecialchars($empleado['num_empleado'] ?? 'N/A'); ?>
-<br>
-<small style="color:#777;">ID: <?php echo $empleado['id_personal']; ?></small>
+<?php echo htmlspecialchars($empleado['num_empleado']); ?><br>
+<small>ID: <?php echo $empleado['id_personal']; ?></small>
 </td>
 
-<td><?php echo htmlspecialchars($nombre_completo ?: 'Sin nombre'); ?></td>
-
+<td><?php echo htmlspecialchars($nombre_completo); ?></td>
 <td><?php echo htmlspecialchars($empleado['nombre_puesto'] ?? 'Sin puesto'); ?></td>
 
+<!-- ESTATUS LABORAL EDITABLE -->
 <td>
-<span style="background: <?php echo $empleado['estatus_laboral'] == 'activo' ? '#4caf50' : '#f44336'; ?>; color: white; padding: 3px 10px; border-radius: 3px; font-size: 12px;">
-<?php echo ucfirst($empleado['estatus_laboral'] ?? 'inactivo'); ?>
-</span>
+<form action="../Controlador/cambiar_estatus_laboral.php" method="POST" style="margin:0;">
+<input type="hidden" name="id_personal" value="<?php echo $empleado['id_personal']; ?>">
+
+<select name="nuevo_estatus"
+style="background:<?php echo $color_laboral; ?>;color:white;font-size:12px;padding:3px;border-radius:3px;">
+<option value="activo" <?php if($empleado['estatus_laboral']=='activo') echo 'selected'; ?>>Activo</option>
+<option value="en_proceso" <?php if($empleado['estatus_laboral']=='en_proceso') echo 'selected'; ?>>En Proceso</option>
+<option value="inactivo" <?php if($empleado['estatus_laboral']=='inactivo') echo 'selected'; ?>>Inactivo</option>
+</select>
+
+<button type="submit" style="font-size:11px;">Guardar</button>
+</form>
 </td>
 
-<td><?php echo $empleado['fecha_alta'] ? date('d/m/Y', strtotime($empleado['fecha_alta'])) : 'N/A'; ?></td>
+<!-- ESTATUS ASIGNACIÓN -->
+<td>
+<?php if (!$estatus_asig): ?>
+<span style="color:#999;">Sin asignación</span>
+<?php else: ?>
+<span style="background:<?php echo $color_asig; ?>;color:white;padding:3px 10px;border-radius:3px;font-size:12px;">
+<?php echo ucfirst($estatus_asig); ?>
+</span>
+<?php endif; ?>
+</td>
 
+<td>
+<?php echo $empleado['fecha_alta'] ? date('d/m/Y', strtotime($empleado['fecha_alta'])) : 'N/A'; ?>
+</td>
+
+<!-- 🔥 CONTRATO CON SUBIDA RESTAURADA -->
 <td>
 
 <?php if ($empleado['contrato_url']): ?>
-<a href="<?php echo htmlspecialchars($empleado['contrato_url']); ?>"
-style="color: #2196f3; text-decoration: none;"
-target="_blank">
+<a href="<?php echo htmlspecialchars($empleado['contrato_url']); ?>" target="_blank">
 Ver contrato
 </a>
 <br><br>
 <?php else: ?>
-<span style="color: #999;">Sin contrato</span>
+<span style="color:#999;">Sin contrato</span>
 <br><br>
 <?php endif; ?>
 
@@ -227,31 +256,13 @@ Subir
 </td>
 
 </tr>
+
 <?php endforeach; ?>
-<?php else: ?>
-<tr>
-<td colspan="6" style="text-align: center; padding: 30px;">
-No hay personal registrado. Acepta solicitudes desde el módulo de Solicitudes.
-</td>
-</tr>
-<?php endif; ?>
 
 </tbody>
 </table>
 </section>
 
 </main>
-
-<script>
-document.getElementById('searchPersonal').addEventListener('keyup', function() {
-var searchText = this.value.toLowerCase();
-var rows = document.querySelectorAll('tbody tr');
-rows.forEach(function(row) {
-var text = row.textContent.toLowerCase();
-row.style.display = text.includes(searchText) ? '' : 'none';
-});
-});
-</script>
-
 </body>
 </html>
