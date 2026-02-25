@@ -1,30 +1,26 @@
 <?php
 session_start();
 
-/* ==============================
-   1️⃣ VERIFICAR SESIÓN
-============================== */
+// Verificar si el usuario ha iniciado sesión
+
 if (!isset($_SESSION['id_usuario'])) {
     header('Location: login.php?error=no_sesion');
     exit();
 }
 
-/* ==============================
-   2️⃣ CONEXIÓN
-============================== */
+// Conexión a la base de datos
+
 require_once '../Modelo/SupaConexion.php';
 $db = new SupaConexion();
 $conn = $db->getConexion();
 
-/* ==============================
-   3️⃣ DATOS USUARIO
-============================== */
+// Obtener datos del usuario para mostrar en el header
+
 $usuario_nombre = $_SESSION['usuario_nombre'] ?? 'Administrador';
 $usuario_correo = $_SESSION['correo'] ?? 'admin@gmail.com';
 
-/* ==============================
-   4️⃣ CONSULTA CON ESTATUS ASIGNACIÓN
-============================== */
+// Consulta para obtener personal con datos relacionados
+
 $sql = "
     SELECT 
         p.id_personal,
@@ -50,9 +46,8 @@ $sql = "
 $stmt = $conn->query($sql);
 $personal = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-/* ==============================
-   5️⃣ CONTADORES
-============================== */
+// Contadores para estatus
+
 $activos = 0;
 $inactivos = 0;
 $en_proceso = 0;
@@ -78,7 +73,7 @@ foreach ($personal as $empleado) {
 <header class="header">
 <div class="header-logo">
 <a href="dashboard.php">
-<img src="../src/imagenes/tactica_logo.png" width="100" height="100">
+<img src="../src/imagenes/tactica_logo.png" width="100">
 </a>
 </div>
 
@@ -219,7 +214,7 @@ style="background:<?php echo $color_laboral; ?>;color:white;font-size:12px;paddi
 <?php echo $empleado['fecha_alta'] ? date('d/m/Y', strtotime($empleado['fecha_alta'])) : 'N/A'; ?>
 </td>
 
-<!-- 🔥 CONTRATO CON SUBIDA RESTAURADA -->
+<!--  CONTRATO CON SUBIDA DE ARCHIVOZ -->
 <td>
 
 <?php if ($empleado['contrato_url']): ?>
