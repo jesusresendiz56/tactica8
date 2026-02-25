@@ -47,6 +47,65 @@ foreach ($solicitudes as $solicitud) {
     <meta charset="UTF-8">
     <title>Solicitudes | TÁCTICA 8</title>
     <link rel="stylesheet" href="../src/estilos/estilos.css">
+    <style>
+        /* Estilos adicionales para las columnas de acciones y exportación */
+        .accion-columna {
+            text-align: center;
+            vertical-align: middle;
+            width: 50px;
+        }
+        .accion-deshabilitada {
+            color: #ccc;
+            font-weight: bold;
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+        }
+        table td {
+            padding: 8px 5px;
+        }
+        
+        /* Estilos para filtros y botón de exportar */
+        .filtros {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .filtros input,
+        .filtros select,
+        .filtros button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .filtros button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .filtros button:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn-exportar {
+            background-color: #28a745 !important;
+            margin-left: 10px;
+        }
+        
+        .btn-exportar:hover {
+            background-color: #218838 !important;
+        }
+    </style>
 </head>
 <body>
     <!-- ===== HEADER ===== -->
@@ -111,6 +170,7 @@ foreach ($solicitudes as $solicitud) {
                     <option value="rechazada">Rechazada</option>
                 </select>
                 <button onclick="filtrarTabla()">Buscar</button>
+                <button onclick="exportarAExcel()" class="btn-exportar">     Exportar a Excel</button>
             </div>
 
             <table id="tablaSolicitudes">
@@ -185,27 +245,6 @@ foreach ($solicitudes as $solicitud) {
         </section>
     </main>
 
-    <style>
-        /* Estilos adicionales para las columnas de acciones */
-        .accion-columna {
-            text-align: center;
-            vertical-align: middle;
-            width: 50px;
-        }
-        .accion-deshabilitada {
-            color: #ccc;
-            font-weight: bold;
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            line-height: 24px;
-            text-align: center;
-        }
-        table td {
-            padding: 8px 5px;
-        }
-    </style>
-
     <script>
         function filtrarTabla() {
             var input = document.getElementById('searchInput');
@@ -234,7 +273,36 @@ foreach ($solicitudes as $solicitud) {
             }
         }
 
-        document.getElementById('searchInput').addEventListener('keyup', filtrarTabla);
+        function exportarAExcel() {
+            // Obtener los valores actuales de los filtros
+            var searchText = document.getElementById('searchInput').value;
+            var filterStatus = document.getElementById('filterStatus').value;
+            
+            // Construir la URL con los filtros
+            var url = '../Controlador/exportar_solicitudes_excel.php?';
+            
+            if (searchText) {
+                url += 'busqueda=' + encodeURIComponent(searchText) + '&';
+            }
+            
+            if (filterStatus) {
+                url += 'estado=' + encodeURIComponent(filterStatus) + '&';
+            }
+            
+            // Eliminar el último & si existe
+            url = url.replace(/&$/, '');
+            
+            // Redireccionar para descargar el archivo
+            window.location.href = url;
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                filtrarTabla();
+            }
+        });
+        
         document.getElementById('filterStatus').addEventListener('change', filtrarTabla);
     </script>
 </body>
