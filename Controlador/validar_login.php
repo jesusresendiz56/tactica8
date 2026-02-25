@@ -42,7 +42,7 @@ try {
         /* ===============================
            REDIRIGIR AL DASHBOARD
         ================================ */
-        header("Location: ../Vista/dashboard.php");
+        header("Location: ../index.php");
         exit();
 
     } else {
