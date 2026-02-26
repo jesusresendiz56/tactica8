@@ -47,6 +47,7 @@ foreach ($solicitudes as $solicitud) {
     <meta charset="UTF-8">
     <title>Solicitudes | TÁCTICA 8</title>
     <link rel="stylesheet" href="../src/estilos/estilos.css">
+    <script src="../src/js/seguridad.js" defer></script>
     <style>
         /* Estilos adicionales para las columnas de acciones y exportación */
         .accion-columna {

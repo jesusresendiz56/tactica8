@@ -66,6 +66,7 @@ foreach ($personal as $empleado) {
 <meta charset="UTF-8">
 <title>Personal | TÁCTICA 8</title>
 <link rel="stylesheet" href="../src/estilos/estilos.css">
+<script src="../src/js/seguridad.js" defer></script>
 </head>
 
 <body>
