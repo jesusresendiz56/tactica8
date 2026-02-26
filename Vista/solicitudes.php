@@ -128,7 +128,7 @@ foreach ($solicitudes as $solicitud) {
 
     <!-- ===== MENÚ LATERAL ===== -->
     <nav class="menu">
-        <a href="index.php">Dashboard</a>
+        <a href= "index.php">Dashboard</a>
         <a href="../Vista/campañas.php">Campañas</a>
         <a href="../Vista/personal.php">Personal</a>
         <a href="../Vista/asignaciones.php">Asignaciones</a>
