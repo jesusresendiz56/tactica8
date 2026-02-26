@@ -34,7 +34,7 @@ require_once '../Modelo/SupaConexion.php';
 
 <header class="header">
     <div class="header-logo">
-        <a href="dashboard.php">
+        <a href="../index.php">
             <img src="../src/imagenes/tactica_logo.png" width="100" alt="TÁCTICA 8">
         </a>
     </div>
@@ -61,7 +61,7 @@ require_once '../Modelo/SupaConexion.php';
 </header>
 
 <nav class="menu">
-    <a href="index.php">Dashboard</a>
+    <a href="../index.php">Dashboard</a>
     <a href="../Vista/campañas.php" class="active">Campañas</a>
     <a href="../Vista/personal.php">Personal</a>
     <a href="../Vista/asignaciones.php">Asignaciones</a>

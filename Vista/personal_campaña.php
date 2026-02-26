@@ -204,7 +204,7 @@ $asignados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- HEADER -->
 <header class="header">
     <div class="header-logo">
-        <a href="../Vista/campañas.php">
+        <a href="../index.php">
             <img src="../src/imagenes/tactica_logo.png"
                  alt="TÁCTICA 8"
                  class="logo-img"
@@ -243,7 +243,7 @@ $asignados = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <p class="subtitle">Gestión del equipo asignado</p>
         </div>
 
-        <a href="campañas.php" class="btn-secondary">
+        <a href="../Vista/campañas.php" class="btn-secondary">
             ← Volver a Campañas
         </a>
     </div>

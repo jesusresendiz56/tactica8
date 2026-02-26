@@ -35,7 +35,7 @@ try {
     <!-- ===== HEADER ===== -->
     <header class="header">
         <div class="logo">
-            <a href= index.php">
+            <a href= ../index.php">
                 <img src="../src/imagenes/tactica_logo.png"
                      alt="TÁCTICA 8"
                      class="logo-img"
@@ -73,12 +73,12 @@ try {
 
     <!-- ===== MENÚ ===== -->
     <nav class="menu">
-        <a href="dashboard.php">Dashboard</a>
-        <a href="campañas.php">Campañas</a>
-        <a href="personal.php">Personal</a>
-        <a href="asignaciones.php" class="active">Asignaciones</a>
-        <a href="reportes.php">Reportes</a>
-        <a href="solicitudes.php">Solicitudes</a>
+        <a href="../index.php">Dashboard</a>
+        <a href="../Vista/campañas.php">Campañas</a>
+        <a href="../Vista/personal.php">Personal</a>
+        <a href="../Vista/asignaciones.php" class="active">Asignaciones</a>
+        <a href="../Vista/reportes.php">Reportes</a>
+        <a href="../Vista/solicitudes.php">Solicitudes</a>
     </nav>
 
     <!-- ===== FORMULARIO ===== -->

@@ -31,7 +31,7 @@ $usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmai
     <header class="header">
         <!-- Logo -->
         <div class="header-logo">
-            <a href="index.php">
+            <a href="../index.php">
                 <img src="../src/imagenes/tactica_logo.png"
                      alt="TÁCTICA 8"
                      class="logo-img"
@@ -66,7 +66,7 @@ $usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmai
 
     <!-- ===== MENÚ ===== -->
     <nav class="menu">
-        <a href="index.php">Dashboard</a>
+        <a href="../index.php">Dashboard</a>
         <a href="../Vista/campañas.php">Campañas</a>
         <a href="../Vista/personal.php">Personal</a>
         <a href="../Vista/asignaciones.php">Asignaciones</a>

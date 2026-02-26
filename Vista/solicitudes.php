@@ -111,7 +111,7 @@ foreach ($solicitudes as $solicitud) {
     <!-- ===== HEADER ===== -->
     <header class="header">
         <div class="header-logo">
-            <a href="index.php">
+            <a href="../index.php">
                 <img src="../src/imagenes/tactica_logo.png" alt="TÁCTICA 8" class="logo-img" width="100" height="100">
             </a>
         </div>
