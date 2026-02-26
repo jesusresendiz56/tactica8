@@ -303,7 +303,7 @@ $conn = null;
     <!-- ===== MENÚ ===== -->
     <nav class="menu">
         <a href="index.php" class="active">Dashboard</a>
-        <a href="../tactica8/Vista/campañas.php">Campañas</a>
+        <a href="../Vista/campañas.php">Campañas</a>
         <a href="personal.php">Personal</a>
         <a href="asignaciones.php">Asignaciones</a>
         <a href="reportes.php">Reportes</a>
