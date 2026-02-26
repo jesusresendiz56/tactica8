@@ -304,10 +304,10 @@ $conn = null;
     <nav class="menu">
         <a href="index.php" class="active">Dashboard</a>
         <a href="../Vista/campañas.php">Campañas</a>
-        <a href="personal.php">Personal</a>
-        <a href="asignaciones.php">Asignaciones</a>
-        <a href="reportes.php">Reportes</a>
-        <a href="solicitudes.php">Solicitudes</a>
+        <a href="../Vista/personal.php">Personal</a>
+        <a href="../Vista/asignaciones.php">Asignaciones</a>
+        <a href="../Vista/reportes.php">Reportes</a>
+        <a href="../Vista/solicitudes.php">Solicitudes</a>
     </nav>
 
     <div class="content">
