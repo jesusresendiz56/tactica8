@@ -176,8 +176,8 @@ if ($estatus_asig == 'en_progreso') $color_asig = '#ff9800';
 <tr>
 
 <td>
-<?php echo htmlspecialchars($empleado['num_empleado']); ?><br>
-<small>ID: <?php echo $empleado['id_personal']; ?></small>
+    <?php echo htmlspecialchars($empleado['num_empleado'] ?? ''); ?><br>
+    <small>ID: <?php echo $empleado['id_personal']; ?></small>
 </td>
 
 <td><?php echo htmlspecialchars($nombre_completo); ?></td>
