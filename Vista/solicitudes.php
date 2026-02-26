@@ -46,6 +46,7 @@ foreach ($solicitudes as $solicitud) {
 <head>
     <meta charset="UTF-8">
     <title>Solicitudes | TÁCTICA 8</title>
+    <link rel="icon" type="image/png" href="../src/imagenes/favicon.png">
     <link rel="stylesheet" href="../src/estilos/estilos.css">
     <script src="../src/js/seguridad.js" defer></script>
     <style>
