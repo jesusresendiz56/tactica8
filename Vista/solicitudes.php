@@ -111,7 +111,7 @@ foreach ($solicitudes as $solicitud) {
     <!-- ===== HEADER ===== -->
     <header class="header">
         <div class="header-logo">
-            <a href="dashboard.php">
+            <a href="index.php">
                 <img src="../src/imagenes/tactica_logo.png" alt="TÁCTICA 8" class="logo-img" width="100" height="100">
             </a>
         </div>
@@ -129,11 +129,11 @@ foreach ($solicitudes as $solicitud) {
     <!-- ===== MENÚ LATERAL ===== -->
     <nav class="menu">
         <a href="index.php">Dashboard</a>
-        <a href="campañas.php">Campañas</a>
-        <a href="personal.php">Personal</a>
-        <a href="asignaciones.php">Asignaciones</a>
-        <a href="reportes.php">Reportes</a>
-        <a href="solicitudes.php">Solicitudes</a>
+        <a href="../Vista/campañas.php">Campañas</a>
+        <a href="../Vista/personal.php">Personal</a>
+        <a href="../Vista/asignaciones.php">Asignaciones</a>
+        <a href="../Vista/reportes.php">Reportes</a>
+        <a href="../Vista/solicitudes.php" class="active">Solicitudes</a>
     </nav>
 
     <!-- ===== CONTENIDO PRINCIPAL ===== -->

@@ -35,7 +35,7 @@ try {
     <!-- ===== HEADER ===== -->
     <header class="header">
         <div class="logo">
-            <a href="dashboard.php">
+            <a href= index.php">
                 <img src="../src/imagenes/tactica_logo.png"
                      alt="TÁCTICA 8"
                      class="logo-img"

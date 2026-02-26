@@ -204,7 +204,7 @@ $asignados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- HEADER -->
 <header class="header">
     <div class="header-logo">
-        <a href="campañas.php">
+        <a href="../Vista/campañas.php">
             <img src="../src/imagenes/tactica_logo.png"
                  alt="TÁCTICA 8"
                  class="logo-img"
