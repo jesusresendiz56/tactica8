@@ -268,7 +268,7 @@ $conn = null;
     <!-- ===== HEADER ===== -->
     <header class="header">
         <div class="header-logo">
-            <a href="dashboard.php">
+            <a href="index.php">
                 <img src="../src/imagenes/tactica_logo.png"
                      alt="TÁCTICA 8"
                      class="logo-img"
@@ -302,8 +302,8 @@ $conn = null;
 
     <!-- ===== MENÚ ===== -->
     <nav class="menu">
-        <a href="dashboard.php" class="active">Dashboard</a>
-        <a href="campañas.php">Campañas</a>
+        <a href="index.php" class="active">Dashboard</a>
+        <a href="../tactica8/Vista/campañas.php">Campañas</a>
         <a href="personal.php">Personal</a>
         <a href="asignaciones.php">Asignaciones</a>
         <a href="reportes.php">Reportes</a>
