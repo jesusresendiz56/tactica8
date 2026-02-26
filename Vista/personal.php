@@ -72,7 +72,7 @@ foreach ($personal as $empleado) {
 
 <header class="header">
 <div class="header-logo">
-<a href="dashboard.php">
+<a href="../index.php">
 <img src="../src/imagenes/tactica_logo.png" width="100">
 </a>
 </div>
