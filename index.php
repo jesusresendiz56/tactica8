@@ -118,6 +118,8 @@ $conn = null;
 <head>
     <meta charset="UTF-8">
     <title>Dashboard | TÁCTICA 8</title>
+
+    <link rel="icon" type="image/png" href="../src/imagenes/logo.png">
     <link rel="stylesheet" href="../src/estilos/estilos.css">
    <script src="../src/js/seguridad.js" defer></script>
     <style>
