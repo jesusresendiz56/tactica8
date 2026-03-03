@@ -81,7 +81,12 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
                 <div class="grid-3">
-                    <input type="date" name="fecha_nacimiento" placeholder="Fecha de nacimiento" required max="2006-02-19">
+                   <span>Fecha de nacimiento</span>
+<input 
+    type="date" 
+    name="fecha_nacimiento" 
+    required 
+    max="2006-02-19">
                     <input type="text" name="lugar_nacimiento" placeholder="Lugar de nacimiento" required>
                     <select name="sexo" required>
                         <option value="">Sexo</option>
