@@ -44,28 +44,27 @@ try {
     $stmt = $conn->query($query);
     $resultado = $stmt->fetch();
     $campanas_pendientes = $resultado['total'] ?? 0;
-    
+
     // En Progreso
     $query = "SELECT COUNT(*) as total FROM campañas WHERE estatus = 'en_progreso'";
     $stmt = $conn->query($query);
     $resultado = $stmt->fetch();
     $campanas_progreso = $resultado['total'] ?? 0;
-    
+
     // Completadas
     $query = "SELECT COUNT(*) as total FROM campañas WHERE estatus = 'completada'";
     $stmt = $conn->query($query);
     $resultado = $stmt->fetch();
     $campanas_completadas = $resultado['total'] ?? 0;
-    
+
     // Canceladas
     $query = "SELECT COUNT(*) as total FROM campañas WHERE estatus = 'cancelada'";
     $stmt = $conn->query($query);
     $resultado = $stmt->fetch();
     $campanas_canceladas = $resultado['total'] ?? 0;
-    
+
     // Total campañas activas (pendientes + en_progreso)
     $campanas_activas = $campanas_pendientes + $campanas_progreso;
-    
 } catch (PDOException $e) {
     // Si hay error, dejar valores en 0
 }
@@ -115,14 +114,15 @@ $conn = null;
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Dashboard | TÁCTICA 8</title>
     <link rel="stylesheet" href="../src/estilos/estilos.css">
-   <script src="../src/js/seguridad.js" defer></script>
+    <script src="../src/js/seguridad.js" defer></script>
     <style>
         /* Mantener estilos originales del dashboard.css */
-        
+
         /* Estilos para las cards de estatus de campañas */
         .campanas-estatus {
             display: grid;
@@ -131,63 +131,69 @@ $conn = null;
             margin-top: 20px;
             margin-bottom: 30px;
         }
-        
+
         .estatus-card {
             background: white;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
             border-top: 4px solid transparent;
         }
-        
-        .estatus-pendiente { 
-            border-top-color: #f39c12; 
+
+        .estatus-pendiente {
+            border-top-color: #f39c12;
         }
-        .estatus-progreso { 
-            border-top-color: #3498db; 
+
+        .estatus-progreso {
+            border-top-color: #3498db;
         }
-        .estatus-completada { 
-            border-top-color: #27ae60; 
+
+        .estatus-completada {
+            border-top-color: #27ae60;
         }
-        .estatus-cancelada { 
-            border-top-color: #e74c3c; 
+
+        .estatus-cancelada {
+            border-top-color: #e74c3c;
         }
-        
+
         .estatus-titulo {
             font-size: 16px;
             color: #666;
             margin-bottom: 10px;
             display: block;
         }
-        
+
         .estatus-numero {
             font-size: 42px;
             font-weight: bold;
             margin: 10px 0;
             display: block;
         }
-        
-        .estatus-pendiente .estatus-numero { 
-            color: #f39c12; 
+
+        .estatus-pendiente .estatus-numero {
+            color: #f39c12;
         }
-        .estatus-progreso .estatus-numero { 
-            color: #3498db; 
+
+        .estatus-progreso .estatus-numero {
+            color: #3498db;
         }
-        .estatus-completada .estatus-numero { 
-            color: #27ae60; 
+
+        .estatus-completada .estatus-numero {
+            color: #27ae60;
         }
-        .estatus-cancelada .estatus-numero { 
-            color: #e74c3c; 
+
+        .estatus-cancelada .estatus-numero {
+            color: #e74c3c;
         }
-        
+
         .estatus-label {
             color: #666;
             font-size: 13px;
             display: block;
             margin-top: 5px;
         }
-        
+
         /* Asegurar que los estilos originales del dashboard se mantengan */
         .dashboard-grid {
             display: grid;
@@ -195,22 +201,22 @@ $conn = null;
             gap: 20px;
             margin-bottom: 30px;
         }
-        
+
         .card {
             background: white;
             border-radius: 10px;
             padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
             border-top: 4px solid #ec1f27;
         }
-        
+
         .card h3 {
             color: #1e3c72;
             margin-bottom: 15px;
             font-size: 18px;
         }
-        
+
         .card-number {
             font-size: 48px;
             font-weight: bold;
@@ -218,14 +224,14 @@ $conn = null;
             margin: 10px 0;
             line-height: 1;
         }
-        
+
         .card-label {
             color: #666;
             font-size: 14px;
             display: block;
             margin-top: 10px;
         }
-        
+
         .section-title {
             margin: 30px 0 20px 0;
             color: #1e3c72;
@@ -234,28 +240,30 @@ $conn = null;
             border-bottom: 3px solid #ec1f27;
             padding-bottom: 10px;
         }
-        
+
         h1 {
             margin: 0 0 20px 0;
             color: #333;
             font-size: 28px;
         }
-        
+
         .content {
             margin-top: 80px;
-            
+
             padding: 30px 40px;
         }
-        
+
         /* Responsive */
         @media (max-width: 1200px) {
+
             .dashboard-grid,
             .campanas-estatus {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-        
+
         @media (max-width: 768px) {
+
             .dashboard-grid,
             .campanas-estatus {
                 grid-template-columns: 1fr;
@@ -270,10 +278,10 @@ $conn = null;
         <div class="header-logo">
             <a href="index.php">
                 <img src="../src/imagenes/tactica_logo.png"
-                     alt="TÁCTICA 8"
-                     class="logo-img"
-                     width="100"
-                     height="100">
+                    alt="TÁCTICA 8"
+                    class="logo-img"
+                    width="100"
+                    height="100">
             </a>
         </div>
 
@@ -292,11 +300,11 @@ $conn = null;
                     <?php echo htmlspecialchars($usuario_correo); ?>
                 </span>
             </div>
-            
+
             <a href="../Controlador/logout.php" class="logout-link"
-           onclick="return confirm('¿Estás seguro de cerrar sesión?')">
-            <img src="../src/imagenes/logout.png" width="30" alt="Cerrar Sesión">
-        </a>
+                onclick="return confirm('¿Estás seguro de cerrar sesión?')">
+                <img src="../src/imagenes/logout.png" width="30" alt="Cerrar Sesión">
+            </a>
         </div>
     </header>
 
@@ -345,19 +353,19 @@ $conn = null;
                 <span class="estatus-numero"><?php echo $campanas_pendientes; ?></span>
                 <span class="estatus-label">Esperando inicio</span>
             </div>
-            
+
             <div class="estatus-card estatus-progreso">
                 <span class="estatus-titulo">⚡ En Progreso</span>
                 <span class="estatus-numero"><?php echo $campanas_progreso; ?></span>
                 <span class="estatus-label">Ejecutándose</span>
             </div>
-            
+
             <div class="estatus-card estatus-completada">
                 <span class="estatus-titulo">✅ Completadas</span>
                 <span class="estatus-numero"><?php echo $campanas_completadas; ?></span>
                 <span class="estatus-label">Finalizadas</span>
             </div>
-            
+
             <div class="estatus-card estatus-cancelada">
                 <span class="estatus-titulo">❌ Canceladas</span>
                 <span class="estatus-numero"><?php echo $campanas_canceladas; ?></span>
@@ -365,7 +373,8 @@ $conn = null;
             </div>
         </div>
 
-      
+
     </div>
 </body>
+
 </html>

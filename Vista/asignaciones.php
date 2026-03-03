@@ -24,24 +24,25 @@ try {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Asignaciones | TÁCTICA 8</title>
     <link rel="stylesheet" href="../src/estilos/estilos.css">
     <script src="../src/js/seguridad.js" defer></script>
-   
+
 </head>
 
 <body>
     <!-- ===== HEADER ===== -->
     <header class="header">
         <div class="logo">
-            <a href= "../index.php">
+            <a href="../index.php">
                 <img src="../src/imagenes/tactica_logo.png"
-                     alt="TÁCTICA 8"
-                     class="logo-img"
-                     width="100"
-                     height="100">
+                    alt="TÁCTICA 8"
+                    class="logo-img"
+                    width="100"
+                    height="100">
             </a>
         </div>
 
@@ -61,12 +62,12 @@ try {
                         <?php echo $_SESSION['correo'] ?? ''; ?>
                     </div>
                 </div>
-                <a href="../Controlador/logout.php" 
-                   onclick="return confirm('¿Cerrar sesión?')">
+                <a href="../Controlador/logout.php"
+                    onclick="return confirm('¿Cerrar sesión?')">
                     <img src="../src/imagenes/logout.png"
-                         alt="Salir"
-                         width="30"
-                         height="30">
+                        alt="Salir"
+                        width="30"
+                        height="30">
                 </a>
             </div>
         </div>
@@ -87,13 +88,13 @@ try {
         <!-- MESSAGES -->
         <?php if (isset($_GET['success']) && $_GET['success'] == 'asignacion_creada'): ?>
             <div class="alert-success">
-            Asignación creada .
+                Asignación creada .
             </div>
         <?php endif; ?>
 
         <?php if (isset($_GET['error'])): ?>
             <div class="alert-error">
-                <?php 
+                <?php
                 if ($_GET['error'] == 'campos_vacios') {
                     echo "❌ Todos los campos son obligatorios.";
                 } elseif ($_GET['error'] == 'personal_ya_asignado') {
@@ -130,7 +131,7 @@ try {
 
             <!-- action apunta al controlador -->
             <form method="POST" action="../Controlador/engine_asignaciones.php">
-                
+
                 <!-- ===== COORDINADOR ===== -->
                 <label>Coordinador <span style="color: #999; font-size: 12px;">(Responsable)</span></label>
                 <select name="id_responsable" id="id_responsable" required onchange="cargarCampanasPorCoordinador(this.value)">
@@ -185,16 +186,16 @@ try {
                         )
                         ORDER BY s.apellido_paterno, s.nombre
                     ");
-                    
+
                     $personal_disponible = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    
+
                     if (count($personal_disponible) > 0):
                         foreach ($personal_disponible as $row):
                             $nombre_completo = $row['nombre'] . ' ' . $row['apellido_paterno'] . ' ' . $row['apellido_materno'];
                             $puesto = $row['nombre_puesto'] ? ' (' . $row['nombre_puesto'] . ')' : '';
                             $num_empleado = $row['num_empleado'] ? ' [Empleado: ' . $row['num_empleado'] . ']' : '';
-                            echo "<option value='" . $row['id_personal'] . "'>" 
-                                . htmlspecialchars($nombre_completo . $puesto . $num_empleado) 
+                            echo "<option value='" . $row['id_personal'] . "'>"
+                                . htmlspecialchars($nombre_completo . $puesto . $num_empleado)
                                 . "</option>";
                         endforeach;
                     else:
@@ -222,11 +223,11 @@ try {
         <!-- ===== TABLA DE ASIGNACIONES ===== -->
         <section class="table-section">
             <h2>Asignaciones Recientes</h2>
-            
+
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <input type="search" id="searchAsignaciones" placeholder="Buscar asignaciones..." 
-                       style="padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 3px;">
-                
+                <input type="search" id="searchAsignaciones" placeholder="Buscar asignaciones..."
+                    style="padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 3px;">
+
                 <select id="filtro_estatus" style="padding: 10px; border: 1px solid #ddd; border-radius: 3px;">
                     <option value="">Todos los estatus</option>
                     <option value="activa">Activas</option>
@@ -280,13 +281,13 @@ try {
                         ORDER BY a.fecha_asignacion DESC
                         LIMIT 50
                     ";
-                    
+
                     $asignaciones = $conn->query($sql_asignaciones)->fetchAll(PDO::FETCH_ASSOC);
-                    
+
                     if (count($asignaciones) > 0):
-                        foreach ($asignaciones as $asig): 
+                        foreach ($asignaciones as $asig):
                             $nombre_completo = $asig['nombre'] . ' ' . $asig['apellido_paterno'] . ' ' . $asig['apellido_materno'];
-                            
+
                             // Determinar clase de estatus
                             if ($asig['estatus_asignacion'] == 'activa') {
                                 $estatus_class = 'estatus-activa';
@@ -318,10 +319,10 @@ try {
                                     <small>Campaña: <?php echo ucfirst($asig['estatus_campana']); ?></small>
                                 </td>
                             </tr>
-                    <?php 
-                        endforeach; 
-                    else: 
-                    ?>
+                        <?php
+                        endforeach;
+                    else:
+                        ?>
                         <tr>
                             <td colspan="9" style="text-align: center; padding: 30px;">
                                 No hay asignaciones registradas.
@@ -340,7 +341,7 @@ try {
             const campanaResumen = document.getElementById('campana_resumen');
             const campanaInfo = document.getElementById('campana_info');
             const btnSubmit = document.getElementById('btn-submit');
-            
+
             // Validar que el ID sea válido
             if (!idResponsable || idResponsable === '' || idResponsable === 'null' || idResponsable === 'undefined') {
                 campanaSelect.innerHTML = '<option value="" disabled selected>Primero selecciona un coordinador</option>';
@@ -348,13 +349,13 @@ try {
                 campanaInfo.style.display = 'none';
                 return;
             }
-            
+
             // Mostrar loading
             campanaSelect.innerHTML = '<option value="" disabled selected>Cargando campañas...</option>';
             campanaResumen.style.display = 'block';
             campanaResumen.innerHTML = '<span class="loading">Cargando campañas del coordinador...</span>';
             campanaInfo.style.display = 'none';
-            
+
             // Hacer petición AJAX
             fetch('../Controlador/get_campanas_por_coordinador.php?id_responsable=' + encodeURIComponent(idResponsable))
                 .then(response => {
@@ -369,42 +370,42 @@ try {
                         campanaResumen.innerHTML = '<span style="color: #dc3545;">❌ ' + data.error + '</span>';
                         return;
                     }
-                    
+
                     if (data.campanas.length === 0) {
                         campanaSelect.innerHTML = '<option value="" disabled selected>No hay campañas disponibles para este coordinador</option>';
                         campanaResumen.innerHTML = '<span>No hay campañas activas, en progreso o pendientes para este coordinador</span>';
                         return;
                     }
-                    
+
                     // Construir opciones
                     let options = '<option value="" disabled selected>Seleccionar Campaña</option>';
                     let count_en_progreso = 0;
                     let count_pendiente = 0;
                     let count_activa = 0;
-                    
+
                     data.campanas.forEach(c => {
                         let fechas = '';
                         if (c.fecha_inicio) fechas += ' Inicio: ' + c.fecha_inicio;
                         if (c.fecha_fin) fechas += ' - Fin: ' + c.fecha_fin;
-                        
+
                         options += `<option value="${c.id_campaña}" data-estatus="${c.estatus}">` +
                             `${c.nombre_campaña} (${c.marca_nombre} | ${c.tipo_campaña}) - [${c.estatus}]` +
                             (fechas ? ' - ' + fechas : '') +
                             ` - Resp: ${c.responsable_nombre}</option>`;
-                        
+
                         if (c.estatus === 'en_progreso') count_en_progreso++;
                         if (c.estatus === 'pendiente') count_pendiente++;
                         if (c.estatus === 'activa') count_activa++;
                     });
-                    
+
                     campanaSelect.innerHTML = options;
-                    
+
                     // Actualizar resumen
                     let resumenHtml = 'Campañas disponibles: ';
                     if (count_en_progreso > 0) resumenHtml += `<span class="badge badge-en_progreso">🔵 ${count_en_progreso} en progreso</span> `;
                     if (count_activa > 0) resumenHtml += `<span class="badge badge-activa">🟢 ${count_activa} activas</span> `;
                     if (count_pendiente > 0) resumenHtml += `<span class="badge badge-pendiente">🟡 ${count_pendiente} pendientes</span> `;
-                    
+
                     campanaResumen.innerHTML = resumenHtml;
                 })
                 .catch(error => {
@@ -419,7 +420,7 @@ try {
             var selectedOption = this.options[this.selectedIndex];
             var infoDiv = document.getElementById('campana_info');
             var detallesDiv = document.getElementById('campana_detalles');
-            
+
             if (this.value) {
                 var textParts = selectedOption.text.split(' - ');
                 infoDiv.style.display = 'block';
@@ -437,18 +438,19 @@ try {
             var searchText = document.getElementById('searchAsignaciones').value.toLowerCase();
             var filtroEstatus = document.getElementById('filtro_estatus').value.toLowerCase();
             var rows = document.querySelectorAll('tbody tr');
-            
+
             rows.forEach(function(row) {
                 var text = row.textContent.toLowerCase();
                 var estatusCelda = row.querySelector('td:last-child span:first-child');
                 var estatus = estatusCelda ? estatusCelda.textContent.toLowerCase().trim() : '';
-                
+
                 var coincideTexto = text.includes(searchText);
                 var coincideEstatus = filtroEstatus === '' || estatus.includes(filtroEstatus);
-                
+
                 row.style.display = coincideTexto && coincideEstatus ? '' : 'none';
             });
         }
     </script>
 </body>
+
 </html>

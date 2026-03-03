@@ -44,14 +44,11 @@ try {
         ================================ */
         header("Location: ../index.php");
         exit();
-
     } else {
         header("Location: ../Vista/login.php?error=credenciales");
         exit();
     }
-
 } catch (PDOException $e) {
     header("Location: ../Vista/login.php?error=servidor");
     exit();
 }
-?>

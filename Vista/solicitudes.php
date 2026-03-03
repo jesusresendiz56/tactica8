@@ -43,6 +43,7 @@ foreach ($solicitudes as $solicitud) {
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Solicitudes | TÁCTICA 8</title>
@@ -55,6 +56,7 @@ foreach ($solicitudes as $solicitud) {
             vertical-align: middle;
             width: 50px;
         }
+
         .accion-deshabilitada {
             color: #ccc;
             font-weight: bold;
@@ -64,10 +66,11 @@ foreach ($solicitudes as $solicitud) {
             line-height: 24px;
             text-align: center;
         }
+
         table td {
             padding: 8px 5px;
         }
-        
+
         /* Estilos para filtros y botón de exportar */
         .filtros {
             display: flex;
@@ -76,7 +79,7 @@ foreach ($solicitudes as $solicitud) {
             flex-wrap: wrap;
             margin-bottom: 20px;
         }
-        
+
         .filtros input,
         .filtros select,
         .filtros button {
@@ -85,7 +88,7 @@ foreach ($solicitudes as $solicitud) {
             border-radius: 4px;
             font-size: 14px;
         }
-        
+
         .filtros button {
             background-color: #007bff;
             color: white;
@@ -93,21 +96,22 @@ foreach ($solicitudes as $solicitud) {
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        
+
         .filtros button:hover {
             background-color: #0056b3;
         }
-        
+
         .btn-exportar {
             background-color: #28a745 !important;
             margin-left: 10px;
         }
-        
+
         .btn-exportar:hover {
             background-color: #218838 !important;
         }
     </style>
 </head>
+
 <body>
     <!-- ===== HEADER ===== -->
     <header class="header">
@@ -129,7 +133,7 @@ foreach ($solicitudes as $solicitud) {
 
     <!-- ===== MENÚ LATERAL ===== -->
     <nav class="menu">
-        <a href= "../index.php">Dashboard</a>
+        <a href="../index.php">Dashboard</a>
         <a href="../Vista/campañas.php">Campañas</a>
         <a href="../Vista/personal.php">Personal</a>
         <a href="../Vista/asignaciones.php">Asignaciones</a>
@@ -171,7 +175,7 @@ foreach ($solicitudes as $solicitud) {
                     <option value="rechazada">Rechazada</option>
                 </select>
                 <button onclick="filtrarTabla()">Buscar</button>
-                <button onclick="exportarAExcel()" class="btn-exportar">     Exportar a Excel</button>
+                <button onclick="exportarAExcel()" class="btn-exportar"> Exportar a Excel</button>
             </div>
 
             <table id="tablaSolicitudes">
@@ -192,9 +196,9 @@ foreach ($solicitudes as $solicitud) {
                 <tbody>
                     <?php if (count($solicitudes) > 0): ?>
                         <?php foreach ($solicitudes as $solicitud): ?>
-                            <?php 
-                                $clase_estado = 'estado-' . $solicitud['estatus'];
-                                $estado_texto = ucfirst($solicitud['estatus']);
+                            <?php
+                            $clase_estado = 'estado-' . $solicitud['estatus'];
+                            $estado_texto = ucfirst($solicitud['estatus']);
                             ?>
                             <tr>
                                 <td><?php echo $solicitud['id']; ?></td>
@@ -205,17 +209,17 @@ foreach ($solicitudes as $solicitud) {
                                 <td><span class="estado-badge <?php echo $clase_estado; ?>"><?php echo $estado_texto; ?></span></td>
                                 <td><?php echo $solicitud['fecha_solicitud']; ?></td>
                                 <td class="accion-columna">
-                                    <a href="ver_solicitud.php?id=<?php echo $solicitud['id']; ?>" 
-                                       class="btn-accion btn-ver" title="Ver detalles">
+                                    <a href="ver_solicitud.php?id=<?php echo $solicitud['id']; ?>"
+                                        class="btn-accion btn-ver" title="Ver detalles">
                                         <img src="../src/imagenes/ver.png" alt="Ver" width="24" height="24">
                                     </a>
                                 </td>
                                 <td class="accion-columna">
                                     <?php if ($solicitud['estatus'] == 'pendiente'): ?>
-                                        <a href="../Controlador/engine_procesar_solicitud.php?accion=aceptar&id=<?php echo $solicitud['id']; ?>" 
-                                           class="btn-accion btn-aceptar" 
-                                           onclick="return confirm('¿Aceptar esta solicitud?')" 
-                                           title="Aceptar solicitud">
+                                        <a href="../Controlador/engine_procesar_solicitud.php?accion=aceptar&id=<?php echo $solicitud['id']; ?>"
+                                            class="btn-accion btn-aceptar"
+                                            onclick="return confirm('¿Aceptar esta solicitud?')"
+                                            title="Aceptar solicitud">
                                             <img src="../src/imagenes/aceptar.png" alt="Aceptar" width="24" height="24">
                                         </a>
                                     <?php else: ?>
@@ -224,10 +228,10 @@ foreach ($solicitudes as $solicitud) {
                                 </td>
                                 <td class="accion-columna">
                                     <?php if ($solicitud['estatus'] == 'pendiente'): ?>
-                                        <a href="../Controlador/engine_procesar_solicitud.php?accion=rechazar&id=<?php echo $solicitud['id']; ?>" 
-                                           class="btn-accion btn-rechazar" 
-                                           onclick="return confirm('¿Rechazar esta solicitud?')" 
-                                           title="Rechazar solicitud">
+                                        <a href="../Controlador/engine_procesar_solicitud.php?accion=rechazar&id=<?php echo $solicitud['id']; ?>"
+                                            class="btn-accion btn-rechazar"
+                                            onclick="return confirm('¿Rechazar esta solicitud?')"
+                                            title="Rechazar solicitud">
                                             <img src="../src/imagenes/rechazar.png" alt="Rechazar" width="24" height="24">
                                         </a>
                                     <?php else: ?>
@@ -278,21 +282,21 @@ foreach ($solicitudes as $solicitud) {
             // Obtener los valores actuales de los filtros
             var searchText = document.getElementById('searchInput').value;
             var filterStatus = document.getElementById('filterStatus').value;
-            
+
             // Construir la URL con los filtros
             var url = '../Controlador/exportar_solicitudes_excel.php?';
-            
+
             if (searchText) {
                 url += 'busqueda=' + encodeURIComponent(searchText) + '&';
             }
-            
+
             if (filterStatus) {
                 url += 'estado=' + encodeURIComponent(filterStatus) + '&';
             }
-            
+
             // Eliminar el último & si existe
             url = url.replace(/&$/, '');
-            
+
             // Redireccionar para descargar el archivo
             window.location.href = url;
         }
@@ -303,8 +307,9 @@ foreach ($solicitudes as $solicitud) {
                 filtrarTabla();
             }
         });
-        
+
         document.getElementById('filterStatus').addEventListener('change', filtrarTabla);
     </script>
 </body>
+
 </html>

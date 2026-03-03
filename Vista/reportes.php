@@ -15,6 +15,7 @@ $usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmai
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Reportes | TÁCTICA 8</title>
@@ -33,10 +34,10 @@ $usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmai
         <div class="header-logo">
             <a href="../index.php">
                 <img src="../src/imagenes/tactica_logo.png"
-                     alt="TÁCTICA 8"
-                     class="logo-img"
-                     width="100"
-                     height="100">
+                    alt="TÁCTICA 8"
+                    class="logo-img"
+                    width="100"
+                    height="100">
             </a>
         </div>
 
@@ -56,11 +57,11 @@ $usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmai
                     <?php echo htmlspecialchars($usuario_correo); ?>
                 </span>
             </div>
-            
-          <a href="../Controlador/logout.php" class="logout-link"
-           onclick="return confirm('¿Estás seguro de cerrar sesión?')">
-            <img src="../src/imagenes/logout.png" width="30" alt="Cerrar Sesión">
-        </a>
+
+            <a href="../Controlador/logout.php" class="logout-link"
+                onclick="return confirm('¿Estás seguro de cerrar sesión?')">
+                <img src="../src/imagenes/logout.png" width="30" alt="Cerrar Sesión">
+            </a>
         </div>
     </header>
 
@@ -83,4 +84,5 @@ $usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmai
 
 
 </body>
+
 </html>
