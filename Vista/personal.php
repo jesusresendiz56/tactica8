@@ -2,29 +2,27 @@
 session_start();
 
 // Verificar si el usuario ha iniciado sesión
-
 if (!isset($_SESSION['id_usuario'])) {
     header('Location: login.php?error=no_sesion');
     exit();
 }
 
 // Conexión a la base de datos
-
 require_once '../Modelo/SupaConexion.php';
 $db = new SupaConexion();
 $conn = $db->getConexion();
 
 // Obtener datos del usuario para mostrar en el header
-
 $usuario_nombre = $_SESSION['usuario_nombre'] ?? 'Administrador';
 $usuario_correo = $_SESSION['correo'] ?? 'admin@gmail.com';
 
 // Consulta para obtener personal con datos relacionados
-
+// CORREGIDO: Eliminado p.num_empleado y generado con CONCAT
 $sql = "
     SELECT 
         p.id_personal,
-        p.num_empleado,
+        -- Generar número de empleado a partir del ID
+        CONCAT('EMP', LPAD(p.id_personal::text, 5, '0')) as num_empleado,
         p.cuenta_nomina,
         p.contrato_url,
         p.fecha_alta,
@@ -47,7 +45,6 @@ $stmt = $conn->query($sql);
 $personal = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Contadores para estatus
-
 $activos = 0;
 $inactivos = 0;
 $en_proceso = 0;
@@ -74,6 +71,38 @@ foreach ($personal as $empleado) {
     <title>Personal | TÁCTICA 8</title>
     <link rel="stylesheet" href="../src/estilos/estilos.css">
     <script src="../src/js/seguridad.js" defer></script>
+    <style>
+        /* Estilos adicionales para mejorar la visualización */
+        .badge-estatus {
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: white;
+            display: inline-block;
+        }
+        
+        .btn-subir {
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+        
+        .btn-subir:hover {
+            background-color: #45a049;
+        }
+        
+        select.estatus-select {
+            font-size: 12px;
+            padding: 3px;
+            border-radius: 3px;
+            color: white;
+            border: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -81,7 +110,7 @@ foreach ($personal as $empleado) {
     <header class="header">
         <div class="header-logo">
             <a href="../index.php">
-                <img src="../src/imagenes/tactica_logo.png" width="100">
+                <img src="../src/imagenes/tactica_logo.png" width="100" alt="TÁCTICA 8">
             </a>
         </div>
 
@@ -100,7 +129,7 @@ foreach ($personal as $empleado) {
                 </span>
             </div>
             <a href="../Controlador/logout.php" onclick="return confirm('¿Cerrar sesión?')">
-                <img src="../src/imagenes/logout.png" width="30" height="30">
+                <img src="../src/imagenes/logout.png" width="30" height="30" alt="Salir">
             </a>
         </div>
     </header>
@@ -119,24 +148,24 @@ foreach ($personal as $empleado) {
         <section class="form-section">
             <h1>Gestión de Personal</h1>
 
-            <div style="display:flex; gap:20px; margin-bottom:30px;">
+            <div style="display:flex; gap:20px; margin-bottom:30px; flex-wrap:wrap;">
 
-                <div style="background:#e3f2fd;padding:15px;border-left:5px solid #2196f3;">
+                <div style="background:#e3f2fd;padding:15px;border-left:5px solid #2196f3; min-width:120px;">
                     <span style="font-size:24px;font-weight:bold;"><?php echo count($personal); ?></span>
                     <span style="display:block;color:#666;">Total</span>
                 </div>
 
-                <div style="background:#e8f5e9;padding:15px;border-left:5px solid #4caf50;">
+                <div style="background:#e8f5e9;padding:15px;border-left:5px solid #4caf50; min-width:120px;">
                     <span style="font-size:24px;font-weight:bold;"><?php echo $activos; ?></span>
                     <span style="display:block;color:#666;">Activos</span>
                 </div>
 
-                <div style="background:#fff8e1;padding:15px;border-left:5px solid #ff9800;">
+                <div style="background:#fff8e1;padding:15px;border-left:5px solid #ff9800; min-width:120px;">
                     <span style="font-size:24px;font-weight:bold;"><?php echo $en_proceso; ?></span>
                     <span style="display:block;color:#666;">En Proceso</span>
                 </div>
 
-                <div style="background:#ffebee;padding:15px;border-left:5px solid #f44336;">
+                <div style="background:#ffebee;padding:15px;border-left:5px solid #f44336; min-width:120px;">
                     <span style="font-size:24px;font-weight:bold;"><?php echo $inactivos; ?></span>
                     <span style="display:block;color:#666;">Inactivos</span>
                 </div>
@@ -147,7 +176,11 @@ foreach ($personal as $empleado) {
         <section class="table-section">
             <h2>Personal Existente</h2>
 
-            <table>
+            <div style="margin-bottom:15px;">
+                <input type="text" id="searchPersonal" placeholder="Buscar personal..." style="padding:8px; width:300px; border-radius:4px; border:1px solid #ddd;">
+            </div>
+
+            <table id="tablaPersonal">
                 <thead>
                     <tr>
                         <th>No. Empleado</th>
@@ -161,49 +194,46 @@ foreach ($personal as $empleado) {
                 </thead>
 
                 <tbody>
-
                     <?php foreach ($personal as $empleado):
-
                         $nombre_completo = trim(
                             ($empleado['nombre'] ?? '') . ' ' .
-                                ($empleado['apellido_paterno'] ?? '') . ' ' .
-                                ($empleado['apellido_materno'] ?? '')
+                            ($empleado['apellido_paterno'] ?? '') . ' ' .
+                            ($empleado['apellido_materno'] ?? '')
                         );
 
-                        /* Colores */
-                        $color_laboral = '#f44336';
+                        // Colores para estatus laboral
+                        $color_laboral = '#f44336'; // inactivo
                         if ($empleado['estatus_laboral'] == 'activo') $color_laboral = '#4caf50';
                         if ($empleado['estatus_laboral'] == 'en_proceso') $color_laboral = '#ff9800';
 
+                        // Colores para estatus asignación
                         $estatus_asig = $empleado['estatus_asignacion'] ?? null;
-                        $color_asig = '#999';
+                        $color_asig = '#999'; // sin asignación
                         if ($estatus_asig == 'activa') $color_asig = '#4caf50';
                         if ($estatus_asig == 'en_progreso') $color_asig = '#ff9800';
                     ?>
-
                         <tr>
-
                             <td>
-                                <?php echo htmlspecialchars($empleado['num_empleado'] ?? ''); ?><br>
-                                <small>ID: <?php echo $empleado['id_personal']; ?></small>
+                                <?php echo htmlspecialchars($empleado['num_empleado'] ?? 'N/A'); ?><br>
+                                <small style="color:#999;">ID: <?php echo $empleado['id_personal']; ?></small>
                             </td>
 
-                            <td><?php echo htmlspecialchars($nombre_completo); ?></td>
+                            <td><?php echo htmlspecialchars($nombre_completo ?: 'Sin nombre'); ?></td>
+                            
                             <td><?php echo htmlspecialchars($empleado['nombre_puesto'] ?? 'Sin puesto'); ?></td>
 
                             <!-- ESTATUS LABORAL EDITABLE -->
                             <td>
                                 <form action="../Controlador/cambiar_estatus_laboral.php" method="POST" style="margin:0;">
                                     <input type="hidden" name="id_personal" value="<?php echo $empleado['id_personal']; ?>">
-
-                                    <select name="nuevo_estatus"
-                                        style="background:<?php echo $color_laboral; ?>;color:white;font-size:12px;padding:3px;border-radius:3px;">
+                                    
+                                    <select name="nuevo_estatus" class="estatus-select" style="background:<?php echo $color_laboral; ?>;">
                                         <option value="activo" <?php if ($empleado['estatus_laboral'] == 'activo') echo 'selected'; ?>>Activo</option>
                                         <option value="en_proceso" <?php if ($empleado['estatus_laboral'] == 'en_proceso') echo 'selected'; ?>>En Proceso</option>
                                         <option value="inactivo" <?php if ($empleado['estatus_laboral'] == 'inactivo') echo 'selected'; ?>>Inactivo</option>
                                     </select>
-
-                                    <button type="submit" style="font-size:11px;">Guardar</button>
+                                    
+                                    <button type="submit" style="margin-left:5px; padding:3px 8px; font-size:11px;">✓</button>
                                 </form>
                             </td>
 
@@ -212,7 +242,7 @@ foreach ($personal as $empleado) {
                                 <?php if (!$estatus_asig): ?>
                                     <span style="color:#999;">Sin asignación</span>
                                 <?php else: ?>
-                                    <span style="background:<?php echo $color_asig; ?>;color:white;padding:3px 10px;border-radius:3px;font-size:12px;">
+                                    <span class="badge-estatus" style="background:<?php echo $color_asig; ?>;">
                                         <?php echo ucfirst($estatus_asig); ?>
                                     </span>
                                 <?php endif; ?>
@@ -222,17 +252,14 @@ foreach ($personal as $empleado) {
                                 <?php echo $empleado['fecha_alta'] ? date('d/m/Y', strtotime($empleado['fecha_alta'])) : 'N/A'; ?>
                             </td>
 
-                            <!--  CONTRATO CON SUBIDA DE ARCHIVOZ -->
+                            <!-- CONTRATO CON SUBIDA DE ARCHIVO -->
                             <td>
-
                                 <?php if ($empleado['contrato_url']): ?>
-                                    <a href="<?php echo htmlspecialchars($empleado['contrato_url']); ?>" target="_blank">
-                                        Ver contrato
+                                    <a href="<?php echo htmlspecialchars($empleado['contrato_url']); ?>" target="_blank" style="display:block; margin-bottom:5px;">
+                                        📄 Ver contrato
                                     </a>
-                                    <br><br>
                                 <?php else: ?>
-                                    <span style="color:#999;">Sin contrato</span>
-                                    <br><br>
+                                    <span style="color:#999; display:block; margin-bottom:5px;">Sin contrato</span>
                                 <?php endif; ?>
 
                                 <form action="../Controlador/subir_contrato.php"
@@ -247,26 +274,31 @@ foreach ($personal as $empleado) {
                                     <input type="file"
                                         name="contrato"
                                         required
-                                        style="font-size:12px; margin-bottom:5px;">
+                                        style="font-size:11px; margin-bottom:5px; width:100%;">
 
-                                    <button type="submit"
-                                        style="padding:4px 8px;font-size:12px;cursor:pointer;">
+                                    <button type="submit" class="btn-subir">
                                         Subir
                                     </button>
-
                                 </form>
-
                             </td>
-
                         </tr>
-
                     <?php endforeach; ?>
-
                 </tbody>
             </table>
         </section>
-
     </main>
-</body>
 
+    <script>
+        // Búsqueda en tiempo real
+        document.getElementById('searchPersonal').addEventListener('keyup', function() {
+            let searchText = this.value.toLowerCase();
+            let rows = document.querySelectorAll('#tablaPersonal tbody tr');
+            
+            rows.forEach(function(row) {
+                let text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
 </html>
