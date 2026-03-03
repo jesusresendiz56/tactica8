@@ -81,9 +81,10 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
                 <div class="grid-3">
-                   <span>Fecha de nacimiento</span>
+                   <label for="fecha_nacimiento">Fecha de nacimiento</label>
 <input 
     type="date" 
+    id="fecha_nacimiento"
     name="fecha_nacimiento" 
     required 
     max="2006-02-19">
