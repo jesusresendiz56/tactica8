@@ -17,13 +17,13 @@ $usuario_nombre = $_SESSION['usuario_nombre'] ?? 'Administrador';
 $usuario_correo = $_SESSION['correo'] ?? 'admin@gmail.com';
 
 // Consulta para obtener personal con datos relacionados
-// CORREGIDO: Eliminado p.num_empleado y generado con CONCAT
+// CORREGIDO: Eliminado p.cuenta_nomina (no existe en la tabla)
 $sql = "
     SELECT 
         p.id_personal,
         -- Generar número de empleado a partir del ID
         CONCAT('EMP', LPAD(p.id_personal::text, 5, '0')) as num_empleado,
-        p.cuenta_nomina,
+        -- p.cuenta_nomina,  ← ELIMINADO - no existe en la tabla
         p.contrato_url,
         p.fecha_alta,
         p.estatus_laboral,
@@ -72,7 +72,7 @@ foreach ($personal as $empleado) {
     <link rel="stylesheet" href="../src/estilos/estilos.css">
     <script src="../src/js/seguridad.js" defer></script>
     <style>
-        /* Estilos adicionales para mejorar la visualización */
+        /* Estilos adicionales */
         .badge-estatus {
             padding: 3px 10px;
             border-radius: 3px;
@@ -101,6 +101,27 @@ foreach ($personal as $empleado) {
             border-radius: 3px;
             color: white;
             border: none;
+        }
+        
+        .search-box {
+            margin-bottom: 15px;
+            padding: 8px;
+            width: 300px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            padding: 15px;
+            min-width: 120px;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -148,36 +169,34 @@ foreach ($personal as $empleado) {
         <section class="form-section">
             <h1>Gestión de Personal</h1>
 
-            <div style="display:flex; gap:20px; margin-bottom:30px; flex-wrap:wrap;">
-
-                <div style="background:#e3f2fd;padding:15px;border-left:5px solid #2196f3; min-width:120px;">
+            <div class="stats-container">
+                <div class="stat-card" style="background:#e3f2fd;border-left:5px solid #2196f3;">
                     <span style="font-size:24px;font-weight:bold;"><?php echo count($personal); ?></span>
                     <span style="display:block;color:#666;">Total</span>
                 </div>
 
-                <div style="background:#e8f5e9;padding:15px;border-left:5px solid #4caf50; min-width:120px;">
+                <div class="stat-card" style="background:#e8f5e9;border-left:5px solid #4caf50;">
                     <span style="font-size:24px;font-weight:bold;"><?php echo $activos; ?></span>
                     <span style="display:block;color:#666;">Activos</span>
                 </div>
 
-                <div style="background:#fff8e1;padding:15px;border-left:5px solid #ff9800; min-width:120px;">
+                <div class="stat-card" style="background:#fff8e1;border-left:5px solid #ff9800;">
                     <span style="font-size:24px;font-weight:bold;"><?php echo $en_proceso; ?></span>
                     <span style="display:block;color:#666;">En Proceso</span>
                 </div>
 
-                <div style="background:#ffebee;padding:15px;border-left:5px solid #f44336; min-width:120px;">
+                <div class="stat-card" style="background:#ffebee;border-left:5px solid #f44336;">
                     <span style="font-size:24px;font-weight:bold;"><?php echo $inactivos; ?></span>
                     <span style="display:block;color:#666;">Inactivos</span>
                 </div>
-
             </div>
         </section>
 
         <section class="table-section">
             <h2>Personal Existente</h2>
 
-            <div style="margin-bottom:15px;">
-                <input type="text" id="searchPersonal" placeholder="Buscar personal..." style="padding:8px; width:300px; border-radius:4px; border:1px solid #ddd;">
+            <div>
+                <input type="text" id="searchPersonal" class="search-box" placeholder="Buscar personal...">
             </div>
 
             <table id="tablaPersonal">
