@@ -31,7 +31,90 @@ try {
     <link rel="icon" type="image/png" href="../src/imagenes/favicon.png">
     <link rel="stylesheet" href="../src/estilos/estilos.css">
     <script src="../src/js/seguridad.js" defer></script>
-
+    <style>
+        /* Estilos adicionales para mejorar la vista */
+        .badge {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .badge-en_progreso { background-color: #007bff; }
+        .badge-activa { background-color: #28a745; }
+        .badge-pendiente { background-color: #ffc107; color: #333; }
+        
+        .loading {
+            color: #007bff;
+            font-style: italic;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 3px;
+            border-left: 3px solid #ffc107;
+        }
+        
+        /* Estilos para estatus en tabla */
+        .estatus-activa {
+            background-color: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .estatus-en_progreso {
+            background-color: #007bff;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .estatus-pendiente {
+            background-color: #ffc107;
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .estatus-finalizada, .estatus-completada {
+            background-color: #6c757d;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .estatus-inactiva {
+            background-color: #dc3545;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .campana-info {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            border-left: 3px solid #007bff;
+        }
+        
+        .btn-disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+    </style>
 </head>
 
 <body>
@@ -88,13 +171,13 @@ try {
     <main class="content">
         <!-- MESSAGES -->
         <?php if (isset($_GET['success']) && $_GET['success'] == 'asignacion_creada'): ?>
-            <div class="alert-success">
-                Asignación creada .
+            <div class="alert-success" style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 3px; margin-bottom: 20px;">
+                ✅ Asignación creada correctamente.
             </div>
         <?php endif; ?>
 
         <?php if (isset($_GET['error'])): ?>
-            <div class="alert-error">
+            <div class="alert-error" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 3px; margin-bottom: 20px;">
                 <?php
                 if ($_GET['error'] == 'campos_vacios') {
                     echo "❌ Todos los campos son obligatorios.";
@@ -157,7 +240,7 @@ try {
                 </div>
 
                 <!-- Información de la campaña seleccionada -->
-                <div id="campana_info" style="background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 3px; border-left: 3px solid #007bff; display: none;">
+                <div id="campana_info" class="campana-info" style="display: none;">
                     <strong>Detalles de la campaña:</strong>
                     <div id="campana_detalles"></div>
                 </div>
@@ -167,7 +250,7 @@ try {
                 <select name="id_personal" id="id_personal" required>
                     <option value="" disabled selected>Seleccionar Personal</option>
                     <?php
-                    // Solo mostrar personal que NO tiene asignaciones activas
+                    // CORREGIDO: Eliminado p.num_empleado y generado con CONCAT
                     $stmt = $conn->query("
                         SELECT 
                             p.id_personal, 
@@ -175,7 +258,8 @@ try {
                             s.apellido_paterno, 
                             s.apellido_materno, 
                             cp.nombre_puesto,
-                            p.num_empleado
+                            -- Generar número de empleado a partir del ID
+                            CONCAT('EMP', LPAD(p.id_personal::text, 5, '0')) as num_empleado
                         FROM personal p
                         INNER JOIN solicitud s ON p.id_solicitud = s.id_solicitud
                         LEFT JOIN cat_puestos cp ON s.id_puesto = cp.id_puesto
@@ -215,7 +299,7 @@ try {
                     </div>
                 <?php endif; ?>
 
-                <button type="submit" id="btn-submit" <?php echo (count($personal_disponible) == 0) ? 'disabled' : ''; ?>>
+                <button type="submit" id="btn-submit" <?php echo (count($personal_disponible) == 0) ? 'disabled class="btn-disabled"' : ''; ?>>
                     Asignar Personal a Campaña
                 </button>
             </form>
@@ -256,12 +340,14 @@ try {
                 </thead>
                 <tbody>
                     <?php
+                    // CORREGIDO: Eliminado p.num_empleado y generado con CONCAT
                     $sql_asignaciones = "
                         SELECT 
                             a.id_asignacion,
                             a.fecha_asignacion,
                             a.estatus_asignacion,
-                            p.num_empleado,
+                            -- Generar número de empleado a partir del ID
+                            CONCAT('EMP', LPAD(p.id_personal::text, 5, '0')) as num_empleado,
                             s.nombre,
                             s.apellido_paterno,
                             s.apellido_materno,
@@ -317,7 +403,7 @@ try {
                                 <td>
                                     <span class="<?php echo $estatus_class; ?>"><?php echo ucfirst($asig['estatus_asignacion']); ?></span>
                                     <br>
-                                    <small>Campaña: <?php echo ucfirst($asig['estatus_campana']); ?></small>
+                                    <small style="color: #666;">Campaña: <?php echo ucfirst($asig['estatus_campana']); ?></small>
                                 </td>
                             </tr>
                         <?php
