@@ -19,6 +19,7 @@ $usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmai
 <head>
     <meta charset="UTF-8">
     <title>Reportes | TÁCTICA 8</title>
+    <link rel="icon" type="image/png" href="../src/imagenes/favicon.png">
     <link rel="stylesheet" href="../src/estilos/estilos.css">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">

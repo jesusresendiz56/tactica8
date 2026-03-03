@@ -16,6 +16,7 @@ $puestos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <title>Solicitud de Empleo | TÁCTICA 8</title>
+    <link rel="icon" type="image/png" href="../src/imagenes/favicon.png">
     <link rel="stylesheet" href="../src/estilos/solicitud.css">
 </head>
 
