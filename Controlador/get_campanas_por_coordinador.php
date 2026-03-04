@@ -1,106 +1,41 @@
 <?php
-// Controlador/get_campanas_por_coordinador.php
 session_start();
-
 if (!isset($_SESSION['id_usuario'])) {
     http_response_code(401);
-    echo json_encode(['error' => 'No autorizado']);
+    echo json_encode(['error'=>'No autorizado','campanas'=>[],'total'=>0]);
     exit();
 }
 
 require_once '../Modelo/SupaConexion.php';
 
+$id = $_GET['id_responsable']??null;
+if(!$id || !is_numeric($id) || ($id=(int)$id)<=0) {
+    echo json_encode(['error'=>'ID inválido','campanas'=>[],'total'=>0]);
+    exit();
+}
+
 try {
-    $db = new SupaConexion();
-    $conn = $db->getConexion();
-    
-    // Verificar que existe el parámetro
-    if (!isset($_GET['id_responsable']) || $_GET['id_responsable'] === '') {
-        echo json_encode([
-            'error' => 'No se recibió el ID del coordinador',
-            'campanas' => [],
-            'total' => 0
-        ]);
-        exit();
-    }
-    
-    $id_responsable = $_GET['id_responsable'];
-    
-    // Validar que sea numérico
-    if (!is_numeric($id_responsable)) {
-        echo json_encode([
-            'error' => 'El ID del coordinador debe ser un número',
-            'campanas' => [],
-            'total' => 0
-        ]);
-        exit();
-    }
-    
-    $id_responsable = intval($id_responsable);
-    
-    if ($id_responsable <= 0) {
-        echo json_encode([
-            'error' => 'ID de coordinador inválido',
-            'campanas' => [],
-            'total' => 0
-        ]);
-        exit();
-    }
-    
-    // Obtener campañas del coordinador seleccionado
-    $sql = "
-        SELECT 
-            c.id_campaña, 
-            c.nombre_campaña,
-            c.fecha_inicio,
-            c.fecha_fin,
-            c.estatus,
-            m.nombre AS marca_nombre,
-            tc.nombre AS tipo_campaña,
-            r.nombre AS responsable_nombre
+    $conn = (new SupaConexion())->getConexion();
+    $stmt = $conn->prepare("
+        SELECT c.id_campaña,c.nombre_campaña,
+               TO_CHAR(c.fecha_inicio,'DD/MM/YYYY') as fecha_inicio,
+               TO_CHAR(c.fecha_fin,'DD/MM/YYYY') as fecha_fin,
+               c.estatus,m.nombre as marca_nombre,
+               tc.nombre as tipo_campaña,
+               r.nombre as responsable_nombre
         FROM campañas c
-        INNER JOIN marcas m ON c.marca_id = m.id_marca
-        INNER JOIN tipos_campaña tc ON c.tipo_campaña_id = tc.id_tipo
-        INNER JOIN responsables r ON c.responsable_id = r.id_responsable
-        WHERE c.responsable_id = :id_responsable
-        AND c.estatus IN ('activa', 'pendiente', 'en_progreso')
-        ORDER BY 
-            CASE 
-                WHEN c.estatus = 'en_progreso' THEN 1
-                WHEN c.estatus = 'activa' THEN 2
-                WHEN c.estatus = 'pendiente' THEN 3
-                ELSE 4
-            END,
-            c.fecha_registro DESC
-    ";
-    
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([':id_responsable' => $id_responsable]);
+        INNER JOIN marcas m ON c.marca_id=m.id_marca
+        INNER JOIN tipos_campaña tc ON c.tipo_campaña_id=tc.id_tipo
+        INNER JOIN responsables r ON c.responsable_id=r.id_responsable
+        WHERE c.responsable_id=:id AND c.estatus IN ('activa','pendiente','en_progreso')
+        ORDER BY CASE c.estatus WHEN 'en_progreso' THEN 1 WHEN 'activa' THEN 2 WHEN 'pendiente' THEN 3 ELSE 4 END,
+                 c.fecha_registro DESC
+    ");
+    $stmt->execute([':id'=>$id]);
     $campanas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Formatear fechas para mostrarlas bien en el select
-    foreach ($campanas as &$campana) {
-        if ($campana['fecha_inicio']) {
-            $campana['fecha_inicio'] = date('d/m/Y', strtotime($campana['fecha_inicio']));
-        }
-        if ($campana['fecha_fin']) {
-            $campana['fecha_fin'] = date('d/m/Y', strtotime($campana['fecha_fin']));
-        }
-    }
-    
-    echo json_encode([
-        'success' => true,
-        'campanas' => $campanas,
-        'total' => count($campanas)
-    ]);
-    
-} catch (PDOException $e) {
-    error_log("Error en get_campanas_por_coordinador: " . $e->getMessage());
-    http_response_code(500);
-    echo json_encode([
-        'error' => 'Error en la base de datos: ' . $e->getMessage(),
-        'campanas' => [],
-        'total' => 0
-    ]);
+    echo json_encode(['success'=>true,'campanas'=>$campanas,'total'=>count($campanas)]);
+} catch(PDOException $e) {
+    error_log("Error get_campanas: ".$e->getMessage());
+    echo json_encode(['error'=>'Error en BD','campanas'=>[],'total'=>0]);
 }
 ?>
