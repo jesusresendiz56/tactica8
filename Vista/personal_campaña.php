@@ -86,6 +86,7 @@ $asignados = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Personal de Campaña | TÁCTICA 8</title>
 
     <link rel="stylesheet" href="../src/estilos/estilos.css">
+    <link rel="icon" type="image/png" href="../src/imagenes/favicon.png">
     <script src="../src/js/seguridad.js" defer></script>
 
     <style>
