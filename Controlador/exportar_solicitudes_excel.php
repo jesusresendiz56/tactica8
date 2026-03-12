@@ -127,7 +127,7 @@ try {
     echo '<table border="1" cellpadding="4" cellspacing="0">';
 
     // ENCABEZADOS
-    echo '<tr style="background-color: #4CAF50; color: white; font-weight: bold;">';
+    echo '<tr style="background-color: #EC1F27; color: white; font-weight: bold;">';
     echo '<th>ID</th><th>Nombre Completo</th><th>Puesto</th><th>Nombre</th><th>Apellido Paterno</th>';
     echo '<th>Apellido Materno</th><th>Fecha Nacimiento</th><th>Sexo</th><th>Estado Civil</th><th>RFC</th>';
     echo '<th>CURP</th><th>IMSS</th><th>Grado Estudios</th><th>Celular</th><th>Teléfono Casa</th>';
