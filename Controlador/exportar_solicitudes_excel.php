@@ -14,7 +14,7 @@ $filtro_estado = isset($_GET['estado']) ? $_GET['estado'] : '';
 $filtro_busqueda = isset($_GET['busqueda']) ? $_GET['busqueda'] : '';
 
 try {
-    // Construir la consulta SQL base - CORREGIDA: INITCAP → INITCAP
+    // Construir la consulta SQL - SOLO APROBADAS y con campos correctos
     $sql = "
         SELECT 
             s.id_solicitud AS id,
@@ -22,19 +22,21 @@ try {
             p.nombre_puesto AS puesto,
             COALESCE(s.celular, s.telefono_casa, s.telefono_recados) AS telefono,
             'Inmediata' AS disponibilidad,
-            INITCAP(s.estatus) AS estatus,  -- CORREGIDO: INITCAP en lugar de INITCAP
+            INITCAP(s.estatus) AS estatus,
             TO_CHAR(s.fecha_registro, 'DD/MM/YYYY') AS fecha_solicitud
         FROM solicitud s
         LEFT JOIN cat_puestos p ON s.id_puesto = p.id_puesto
-        WHERE 1=1
+        WHERE LOWER(s.estatus) = 'aprobada'  -- FILTRO PRINCIPAL: SOLO APROBADAS
     ";
 
     $params = array();
 
-    // Agregar filtro por estado
-    if (!empty($filtro_estado)) {
-        $sql .= " AND LOWER(s.estatus) = LOWER(:estado)";
-        $params[':estado'] = $filtro_estado;
+    // Filtro adicional por estado (si viene, aunque ya estamos filtrando aprobadas)
+    if (!empty($filtro_estado) && strtolower($filtro_estado) == 'aprobada') {
+        // Ya está incluido en el WHERE principal
+    } elseif (!empty($filtro_estado)) {
+        // Si el filtro es diferente a 'aprobada', no mostrar resultados
+        $sql .= " AND 1=0"; // Forzar resultados vacíos
     }
 
     // Agregar filtro por búsqueda (nombre o puesto)
@@ -55,7 +57,7 @@ try {
     $solicitudes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Nombre del archivo
-    $filename = "solicitudes_" . date('Y-m-d_H-i-s') . ".xls";
+    $filename = "solicitudes_aprobadas_" . date('Y-m-d_H-i-s') . ".xls";
 
     // Limpiar cualquier salida previa
     if (ob_get_level()) ob_end_clean();
@@ -65,34 +67,29 @@ try {
     header("Content-Disposition: attachment; filename=\"$filename\"");
     header("Pragma: no-cache");
     header("Expires: 0");
-    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 
     // Crear el contenido del archivo
     echo '<html>';
     echo '<head><meta charset="UTF-8"></head>';
     echo '<body>';
 
-    // Información de los filtros aplicados - IGUAL A LA IMAGEN
+    // Encabezado del reporte
     echo '<table border="0" cellpadding="2" cellspacing="0">';
-    echo '<tr><td colspan="7" style="font-size: 14px; font-weight: bold;">Reporte de Solicitudes - TÁCTICA 8</td></tr>';
+    echo '<tr><td colspan="7" style="font-size: 14px; font-weight: bold;">Reporte de Solicitudes Aprobadas - TÁCTICA 8</td></tr>';
     echo '<tr><td colspan="7">Fecha de exportación: ' . date('d/m/Y H:i:s') . '</td></tr>';
     
-    if (!empty($filtro_estado) || !empty($filtro_busqueda)) {
-        echo '<tr><td colspan="7">Filtros aplicados: ';
-        $filtros_aplicados = array();
-        if (!empty($filtro_estado)) $filtros_aplicados[] = 'Estado: ' . ucfirst($filtro_estado);
-        if (!empty($filtro_busqueda)) $filtros_aplicados[] = 'Búsqueda: "' . htmlspecialchars($filtro_busqueda) . '"';
-        echo implode(' | ', $filtros_aplicados);
-        echo '</td></tr>';
+    // Mostrar filtros aplicados
+    if (!empty($filtro_busqueda)) {
+        echo '<tr><td colspan="7">Filtros aplicados: Búsqueda: "' . htmlspecialchars($filtro_busqueda) . '"</td></tr>';
     }
     
     echo '<tr><td colspan="7">&nbsp;</td></tr>';
     echo '</table>';
 
-    // Iniciar la tabla de datos
+    // Tabla principal
     echo '<table border="1" cellpadding="4" cellspacing="0">';
 
-    // Encabezados de columna - IGUALES A LA IMAGEN
+    // Encabezados
     echo '<tr style="background-color: #4CAF50; color: white; font-weight: bold;">';
     echo '<th>ID</th>';
     echo '<th>Nombre Completo</th>';
@@ -117,13 +114,13 @@ try {
             echo '</tr>';
         }
         
-        // Fila de totales
+        // Total
         echo '<tr style="background-color: #f2f2f2; font-weight: bold;">';
-        echo '<td colspan="7" align="right">Total de registros: ' . count($solicitudes) . '</td>';
+        echo '<td colspan="7" align="right">Total de solicitudes aprobadas: ' . count($solicitudes) . '</td>';
         echo '</tr>';
         
     } else {
-        echo '<tr><td colspan="7" align="center">No hay solicitudes para exportar con los filtros seleccionados</td></tr>';
+        echo '<tr><td colspan="7" align="center">No hay solicitudes aprobadas para exportar</td></tr>';
     }
 
     echo '</table>';
