@@ -226,3 +226,9 @@ td:first-child {
     font-weight: 500;
     color: #333;
 }
+
+.estatus-titulo img{
+    width:20px;
+    vertical-align:middle;
+    margin-right:6px;
+}
