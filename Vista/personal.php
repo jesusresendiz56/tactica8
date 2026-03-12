@@ -16,14 +16,33 @@ $conn = $db->getConexion();
 $usuario_nombre = $_SESSION['usuario_nombre'] ?? 'Administrador';
 $usuario_correo = $_SESSION['correo'] ?? 'admin@gmail.com';
 
+// ===== PROCESAR FORMULARIO DE RESPONSABLE =====
+$mensaje_responsable = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion_responsable'])) {
+    if ($_POST['accion_responsable'] === 'agregar') {
+        $nombre = trim($_POST['nombre'] ?? '');
+        $puesto = trim($_POST['puesto'] ?? '');
+        $estado = $_POST['estado'] ?? 'activo';
+        
+        if ($nombre && $puesto) {
+            try {
+                $stmt = $conn->prepare("INSERT INTO responsables (nombre, puesto, estado) VALUES (?, ?, ?)");
+                $stmt->execute([$nombre, $puesto, $estado]);
+                $mensaje_responsable = '<div class="alert-success" style="padding:10px; margin-bottom:15px;">✅ Responsable agregado correctamente</div>';
+            } catch (PDOException $e) {
+                $mensaje_responsable = '<div class="alert-error" style="padding:10px; margin-bottom:15px;">❌ Error al agregar: ' . $e->getMessage() . '</div>';
+            }
+        } else {
+            $mensaje_responsable = '<div class="alert-error" style="padding:10px; margin-bottom:15px;">❌ Nombre y puesto son obligatorios</div>';
+        }
+    }
+}
+
 // Consulta para obtener personal con datos relacionados
-// CORREGIDO: Eliminado p.cuenta_nomina (no existe en la tabla)
 $sql = "
     SELECT 
         p.id_personal,
-        -- Generar número de empleado a partir del ID
         CONCAT('EMP', LPAD(p.id_personal::text, 5, '0')) as num_empleado,
-        -- p.cuenta_nomina,  ← ELIMINADO - no existe en la tabla
         p.contrato_url,
         p.fecha_alta,
         p.estatus_laboral,
@@ -31,13 +50,14 @@ $sql = "
         s.apellido_paterno,
         s.apellido_materno,
         cp.nombre_puesto,
-        a.estatus_asignacion
+        (SELECT a.estatus_asignacion 
+         FROM asignaciones a 
+         WHERE a.id_personal = p.id_personal 
+         AND a.estatus_asignacion IN ('activa','en_progreso')
+         LIMIT 1) as estatus_asignacion
     FROM personal p
     LEFT JOIN solicitud s ON p.id_solicitud = s.id_solicitud
     LEFT JOIN cat_puestos cp ON s.id_puesto = cp.id_puesto
-    LEFT JOIN asignaciones a 
-        ON p.id_personal = a.id_personal 
-        AND a.estatus_asignacion IN ('activa','en_progreso')
     ORDER BY p.fecha_alta DESC
 ";
 
@@ -62,6 +82,9 @@ foreach ($personal as $empleado) {
             break;
     }
 }
+
+// Obtener lista de responsables para mostrar
+$responsables = $conn->query("SELECT id_responsable, nombre, puesto, estado FROM responsables ORDER BY nombre")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -72,7 +95,7 @@ foreach ($personal as $empleado) {
     <link rel="stylesheet" href="../src/estilos/estilos.css">
     <script src="../src/js/seguridad.js" defer></script>
     <style>
-        /* Estilos adicionales */
+        /* Estilos originales de personal.php */
         .badge-estatus {
             padding: 3px 10px;
             border-radius: 3px;
@@ -123,6 +146,137 @@ foreach ($personal as $empleado) {
             min-width: 120px;
             border-radius: 5px;
         }
+        
+        /* ===== NUEVOS ESTILOS PARA RESPONSABLES (dentro de form-section) ===== */
+        .responsable-form {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .responsable-form h3 {
+            margin-top: 0;
+            color: #ec1f27;
+            border-bottom: 2px solid #ec1f27;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        
+        .btn-agregar {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            height: 38px;
+        }
+        
+        .btn-agregar:hover {
+            background: #218838;
+        }
+        
+        .responsables-mini-lista {
+            margin-top: 15px;
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 3px;
+            padding: 10px;
+        }
+        
+        .responsable-item {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 2px 5px 2px 0;
+            border-left: 3px solid #ec1f27;
+        }
+        
+        .responsable-item.activo {
+            border-left-color: #28a745;
+        }
+        
+        .responsable-item.inactivo {
+            border-left-color: #dc3545;
+            opacity: 0.7;
+        }
+        
+        /* Mantener estilos originales de tabla */
+        .table-section {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .table-section h2 {
+            color: #ec1f27;
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th {
+            background-color: #ec1f27;
+            color: #ffffff;
+            padding: 12px 15px;
+            text-align: left;
+            border-right: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        th:last-child {
+            border-right: none;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #eee;
+        }
+        
+        td:last-child {
+            border-right: none;
+        }
+        
+        tr:hover td {
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 
@@ -166,6 +320,7 @@ foreach ($personal as $empleado) {
 
     <main class="content">
 
+        <!-- ===== PRIMER FORM-SECTION: ESTADÍSTICAS ===== -->
         <section class="form-section">
             <h1>Gestión de Personal</h1>
 
@@ -192,6 +347,56 @@ foreach ($personal as $empleado) {
             </div>
         </section>
 
+        <!-- ===== SEGUNDO FORM-SECTION: FORMULARIO DE RESPONSABLES ===== -->
+        <section class="form-section">
+            <div class="responsable-form">
+                <h3>➕ Agregar Nuevo Responsable / Coordinador</h3>
+                
+                <?php echo $mensaje_responsable; ?>
+                
+                <form method="POST" action="">
+                    <input type="hidden" name="accion_responsable" value="agregar">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre completo *</label>
+                            <input type="text" name="nombre" required placeholder="Ej: Juan Pérez López">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Puesto *</label>
+                            <input type="text" name="puesto" required placeholder="Ej: Coordinador de campañas">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Estado inicial</label>
+                            <select name="estado">
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn-agregar">Agregar Responsable</button>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Mini lista de responsables existentes -->
+                <?php if (!empty($responsables)): ?>
+                <div class="responsables-mini-lista">
+                    <small style="color:#666;">Responsables registrados:</small><br>
+                    <?php foreach ($responsables as $r): ?>
+                        <span class="responsable-item <?php echo $r['estado']; ?>">
+                            <?php echo htmlspecialchars($r['nombre']); ?> (<?php echo htmlspecialchars($r['puesto']); ?>)
+                        </span>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+            </div>
+        </section>
+
+        <!-- ===== TERCER SECTION: TABLA DE PERSONAL ===== -->
         <section class="table-section">
             <h2>Personal Existente</h2>
 
