@@ -349,9 +349,9 @@ $responsables = $conn->query("SELECT id_responsable, nombre, puesto, estado FROM
                             </td>
 
                             <!-- CONTRATO CON SUBIDA DE ARCHIVO -->
-          <td>
+    <td>
     <?php if ($empleado['contrato_url']): ?>
-        <a href="../src/imagenes/contrato.png/<?php echo htmlspecialchars($empleado['contrato_url']); ?>" target="_blank" style="display:block; margin-bottom:5px;">
+        <a href="<?php echo htmlspecialchars($empleado['contrato_url']); ?>" target="_blank" style="display:block; margin-bottom:5px;">
             <img src="../src/imagenes/contrato.png" alt="Ver contrato" style="width:25px; height:25px;">
         </a>
     <?php else: ?>
