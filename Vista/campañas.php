@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+//campañas.php 
 if (!isset($_SESSION['id_usuario'])) {
     header('Location: login.php?error=no_sesion');
     exit();

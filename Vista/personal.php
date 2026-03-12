@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+// Personal.php 
 // Verificar si el usuario ha iniciado sesión
 if (!isset($_SESSION['id_usuario'])) {
     header('Location: login.php?error=no_sesion');
