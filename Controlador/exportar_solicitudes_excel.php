@@ -14,39 +14,72 @@ $filtro_estado = isset($_GET['estado']) ? $_GET['estado'] : '';
 $filtro_busqueda = isset($_GET['busqueda']) ? $_GET['busqueda'] : '';
 
 try {
-    // Construir la consulta SQL - SOLO APROBADAS y con campos correctos
+    // Construir la consulta SQL - TODOS LOS CAMPOS de solicitudes aprobadas
     $sql = "
         SELECT 
             s.id_solicitud AS id,
             TRIM(CONCAT(s.nombre, ' ', s.apellido_paterno, ' ', COALESCE(s.apellido_materno, ''))) AS nombre_completo,
             p.nombre_puesto AS puesto,
-            COALESCE(s.celular, s.telefono_casa, s.telefono_recados) AS telefono,
+            s.nombre,
+            s.apellido_paterno,
+            s.apellido_materno,
+            TO_CHAR(s.fecha_nacimiento, 'DD/MM/YYYY') AS fecha_nacimiento,
+            s.sexo,
+            s.estado_civil,
+            s.rfc,
+            s.curp,
+            s.imss,
+            s.grado_estudios,
+            s.celular,
+            s.telefono_casa,
+            s.telefono_recados,
+            s.correo,
+            s.lugar_nacimiento,
+            s.tipo_sangre,
+            s.salario_deseado,
+            s.credito_infonavit,
+            s.credito_fonacot,
+            s.autorizacion_datos,
             'Inmediata' AS disponibilidad,
             INITCAP(s.estatus) AS estatus,
-            TO_CHAR(s.fecha_registro, 'DD/MM/YYYY') AS fecha_solicitud
+            TO_CHAR(s.fecha_registro, 'DD/MM/YYYY') AS fecha_solicitud,
+            -- Datos de dirección
+            d.calle,
+            d.colonia,
+            d.ciudad,
+            d.municipio,
+            d.estado AS estado_direccion,
+            d.cp,
+            -- Datos familiares
+            df.nombre_padre,
+            df.nombre_madre,
+            df.numero_hijos,
+            df.quien_los_cuida,
+            -- Datos de referencias (solo primera referencia para no complicar)
+            (SELECT STRING_AGG(CONCAT(nombre, ' (', parentesco, ': ', telefono, ')'), ' | ') 
+             FROM referencias r 
+             WHERE r.id_solicitud = s.id_solicitud) AS referencias
         FROM solicitud s
         LEFT JOIN cat_puestos p ON s.id_puesto = p.id_puesto
-        WHERE LOWER(s.estatus) = 'aprobada'  -- FILTRO PRINCIPAL: SOLO APROBADAS
+        LEFT JOIN direcciones d ON s.id_solicitud = d.id_solicitud
+        LEFT JOIN datos_familiares df ON s.id_solicitud = df.id_solicitud
+        WHERE LOWER(s.estatus) = 'aprobada'  -- SOLO SOLICITUDES APROBADAS
     ";
 
     $params = array();
-
-    // Filtro adicional por estado (si viene, aunque ya estamos filtrando aprobadas)
-    if (!empty($filtro_estado) && strtolower($filtro_estado) == 'aprobada') {
-        // Ya está incluido en el WHERE principal
-    } elseif (!empty($filtro_estado)) {
-        // Si el filtro es diferente a 'aprobada', no mostrar resultados
-        $sql .= " AND 1=0"; // Forzar resultados vacíos
-    }
 
     // Agregar filtro por búsqueda (nombre o puesto)
     if (!empty($filtro_busqueda)) {
         $sql .= " AND (
             LOWER(CONCAT(s.nombre, ' ', s.apellido_paterno, ' ', COALESCE(s.apellido_materno, ''))) LIKE :busqueda 
             OR LOWER(p.nombre_puesto) LIKE :busqueda2
+            OR LOWER(s.rfc) LIKE :busqueda3
+            OR LOWER(s.curp) LIKE :busqueda4
         )";
         $params[':busqueda'] = '%' . strtolower($filtro_busqueda) . '%';
         $params[':busqueda2'] = '%' . strtolower($filtro_busqueda) . '%';
+        $params[':busqueda3'] = '%' . strtolower($filtro_busqueda) . '%';
+        $params[':busqueda4'] = '%' . strtolower($filtro_busqueda) . '%';
     }
 
     $sql .= " ORDER BY s.fecha_registro DESC";
@@ -57,7 +90,7 @@ try {
     $solicitudes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Nombre del archivo
-    $filename = "solicitudes_aprobadas_" . date('Y-m-d_H-i-s') . ".xls";
+    $filename = "solicitudes_aprobadas_completas_" . date('Y-m-d_H-i-s') . ".xls";
 
     // Limpiar cualquier salida previa
     if (ob_get_level()) ob_end_clean();
@@ -75,52 +108,112 @@ try {
 
     // Encabezado del reporte
     echo '<table border="0" cellpadding="2" cellspacing="0">';
-    echo '<tr><td colspan="7" style="font-size: 14px; font-weight: bold;">Reporte de Solicitudes Aprobadas - TÁCTICA 8</td></tr>';
-    echo '<tr><td colspan="7">Fecha de exportación: ' . date('d/m/Y H:i:s') . '</td></tr>';
+    echo '<tr><td colspan="30" style="font-size: 14px; font-weight: bold;">Reporte COMPLETO de Solicitudes Aprobadas - TÁCTICA 8</td></tr>';
+    echo '<tr><td colspan="30">Fecha de exportación: ' . date('d/m/Y H:i:s') . '</td></tr>';
     
     // Mostrar filtros aplicados
     if (!empty($filtro_busqueda)) {
-        echo '<tr><td colspan="7">Filtros aplicados: Búsqueda: "' . htmlspecialchars($filtro_busqueda) . '"</td></tr>';
+        echo '<tr><td colspan="30">Filtros aplicados: Búsqueda: "' . htmlspecialchars($filtro_busqueda) . '"</td></tr>';
     }
     
-    echo '<tr><td colspan="7">&nbsp;</td></tr>';
+    echo '<tr><td colspan="30">&nbsp;</td></tr>';
     echo '</table>';
 
     // Tabla principal
     echo '<table border="1" cellpadding="4" cellspacing="0">';
 
-    // Encabezados
+    // ENCABEZADOS - TODOS LOS CAMPOS
     echo '<tr style="background-color: #4CAF50; color: white; font-weight: bold;">';
     echo '<th>ID</th>';
     echo '<th>Nombre Completo</th>';
     echo '<th>Puesto</th>';
-    echo '<th>Teléfono</th>';
+    echo '<th>Nombre</th>';
+    echo '<th>Apellido Paterno</th>';
+    echo '<th>Apellido Materno</th>';
+    echo '<th>Fecha Nacimiento</th>';
+    echo '<th>Sexo</th>';
+    echo '<th>Estado Civil</th>';
+    echo '<th>RFC</th>';
+    echo '<th>CURP</th>';
+    echo '<th>IMSS</th>';
+    echo '<th>Grado Estudios</th>';
+    echo '<th>Celular</th>';
+    echo '<th>Teléfono Casa</th>';
+    echo '<th>Teléfono Recados</th>';
+    echo '<th>Correo</th>';
+    echo '<th>Lugar Nacimiento</th>';
+    echo '<th>Tipo Sangre</th>';
+    echo '<th>Salario Deseado</th>';
+    echo '<th>Infonavit</th>';
+    echo '<th>Fonacot</th>';
+    echo '<th>Autorización Datos</th>';
     echo '<th>Disponibilidad</th>';
     echo '<th>Estatus</th>';
-    echo '<th>Fecha de Solicitud</th>';
+    echo '<th>Fecha Solicitud</th>';
+    echo '<th>Calle</th>';
+    echo '<th>Colonia</th>';
+    echo '<th>Ciudad</th>';
+    echo '<th>Municipio</th>';
+    echo '<th>Estado (Dirección)</th>';
+    echo '<th>CP</th>';
+    echo '<th>Nombre Padre</th>';
+    echo '<th>Nombre Madre</th>';
+    echo '<th>Número Hijos</th>';
+    echo '<th>Quien los Cuida</th>';
+    echo '<th>Referencias</th>';
     echo '</tr>';
 
-    // Datos
+    // DATOS
     if (count($solicitudes) > 0) {
-        foreach ($solicitudes as $solicitud) {
+        foreach ($solicitudes as $s) {
             echo '<tr>';
-            echo '<td>' . htmlspecialchars($solicitud['id']) . '</td>';
-            echo '<td>' . htmlspecialchars($solicitud['nombre_completo']) . '</td>';
-            echo '<td>' . htmlspecialchars($solicitud['puesto']) . '</td>';
-            echo '<td>' . htmlspecialchars($solicitud['telefono']) . '</td>';
-            echo '<td>' . htmlspecialchars($solicitud['disponibilidad']) . '</td>';
-            echo '<td>' . htmlspecialchars($solicitud['estatus']) . '</td>';
-            echo '<td>' . htmlspecialchars($solicitud['fecha_solicitud']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['id']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['nombre_completo']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['puesto']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['nombre']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['apellido_paterno']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['apellido_materno']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['fecha_nacimiento']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['sexo']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['estado_civil']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['rfc']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['curp']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['imss']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['grado_estudios']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['celular']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['telefono_casa']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['telefono_recados']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['correo']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['lugar_nacimiento']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['tipo_sangre']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['salario_deseado']) . '</td>';
+            echo '<td>' . ($s['credito_infonavit'] ? 'Sí' : 'No') . '</td>';
+            echo '<td>' . ($s['credito_fonacot'] ? 'Sí' : 'No') . '</td>';
+            echo '<td>' . ($s['autorizacion_datos'] ? 'Sí' : 'No') . '</td>';
+            echo '<td>' . htmlspecialchars($s['disponibilidad']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['estatus']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['fecha_solicitud']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['calle']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['colonia']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['ciudad']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['municipio']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['estado_direccion']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['cp']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['nombre_padre']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['nombre_madre']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['numero_hijos']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['quien_los_cuida']) . '</td>';
+            echo '<td>' . htmlspecialchars($s['referencias']) . '</td>';
             echo '</tr>';
         }
         
         // Total
         echo '<tr style="background-color: #f2f2f2; font-weight: bold;">';
-        echo '<td colspan="7" align="right">Total de solicitudes aprobadas: ' . count($solicitudes) . '</td>';
+        echo '<td colspan="37" align="right">Total de solicitudes aprobadas: ' . count($solicitudes) . '</td>';
         echo '</tr>';
         
     } else {
-        echo '<tr><td colspan="7" align="center">No hay solicitudes aprobadas para exportar</td></tr>';
+        echo '<tr><td colspan="37" align="center">No hay solicitudes aprobadas para exportar</td></tr>';
     }
 
     echo '</table>';
