@@ -349,30 +349,41 @@ $conn = null;
 
         <!-- SECCIÓN 2: ESTATUS DE CAMPAÑAS -->
         <h2 class="section-title">Estatus de Campañas</h2>
-        <div class="campanas-estatus">
-            <div class="estatus-card estatus-pendiente">
-                <span class="estatus-titulo">⏳ Pendientes</span>
-                <span class="estatus-numero"><?php echo $campanas_pendientes; ?></span>
-                <span class="estatus-label">Esperando inicio</span>
-            </div>
 
-            <div class="estatus-card estatus-progreso">
-                <span class="estatus-titulo">⚡ En Progreso</span>
-                <span class="estatus-numero"><?php echo $campanas_progreso; ?></span>
-                <span class="estatus-label">Ejecutándose</span>
-            </div>
+        <div class="estatus-card estatus-pendiente">
+    <span class="estatus-titulo">
+        <img src="../src/imagenes/pendiente.png" width="20"> Pendientes
+    </span>
+    <span class="estatus-numero"><?php echo $campanas_pendientes; ?></span>
+    <span class="estatus-label">Esperando inicio</span>
+</div>
+
+
+          <div class="estatus-card estatus-progreso">
+    <span class="estatus-titulo">
+        <img src="../src/imagenes/progreso.png" width="20"> En Progreso
+    </span>
+    <span class="estatus-numero"><?php echo $campanas_progreso; ?></span>
+    <span class="estatus-label">Ejecutándose</span>
+</div>
 
             <div class="estatus-card estatus-completada">
-                <span class="estatus-titulo">✅ Completadas</span>
-                <span class="estatus-numero"><?php echo $campanas_completadas; ?></span>
-                <span class="estatus-label">Finalizadas</span>
-            </div>
+    <span class="estatus-titulo">
+        <img src="../src/imagenes/aceptar.png" width="20"> Completadas
+    </span>
+    <span class="estatus-numero"><?php echo $campanas_completadas; ?></span>
+    <span class="estatus-label">Finalizadas</span>
+</div>
 
-            <div class="estatus-card estatus-cancelada">
-                <span class="estatus-titulo">❌ Canceladas</span>
-                <span class="estatus-numero"><?php echo $campanas_canceladas; ?></span>
-                <span class="estatus-label">No realizadas</span>
-            </div>
+
+           <div class="estatus-card estatus-cancelada">
+    <span class="estatus-titulo">
+        <img src="../src/imagenes/rechazar.png" width="20"> Canceladas
+    </span>
+    <span class="estatus-numero"><?php echo $campanas_canceladas; ?></span>
+    <span class="estatus-label">No realizadas</span>
+</div>
+
         </div>
 
 
