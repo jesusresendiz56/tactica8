@@ -350,6 +350,8 @@ $conn = null;
         <!-- SECCIÓN 2: ESTATUS DE CAMPAÑAS -->
         <h2 class="section-title">Estatus de Campañas</h2>
 
+        <div class="campanas-estatus">
+            
         <div class="estatus-card estatus-pendiente">
     <span class="estatus-titulo">
         <img src="../src/imagenes/pendiente.png" width="20"> Pendientes
