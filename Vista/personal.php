@@ -93,6 +93,7 @@ $responsables = $conn->query("SELECT id_responsable, nombre, puesto, estado FROM
     <meta charset="UTF-8">
     <title>Personal | TÁCTICA 8</title>
     <link rel="stylesheet" href="../src/estilos/estilos.css">
+    <link rel="icon" type="image/png" href="../src/imagenes/favicon.png">
     <script src="../src/js/seguridad.js" defer></script>
     <style>
         /* Estilos originales de personal.php */
