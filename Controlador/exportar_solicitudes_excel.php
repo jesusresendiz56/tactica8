@@ -14,15 +14,15 @@ $filtro_estado = isset($_GET['estado']) ? $_GET['estado'] : '';
 $filtro_busqueda = isset($_GET['busqueda']) ? $_GET['busqueda'] : '';
 
 try {
-    // Construir la consulta SQL base - SOLO CON CAMPOS QUE EXISTEN EN TU BD
+    // Construir la consulta SQL base - CORREGIDA: INITCAP → INITCAP
     $sql = "
         SELECT 
             s.id_solicitud AS id,
-            CONCAT(s.nombre, ' ', s.apellido_paterno, ' ', COALESCE(s.apellido_materno, '')) AS nombre_completo,
+            TRIM(CONCAT(s.nombre, ' ', s.apellido_paterno, ' ', COALESCE(s.apellido_materno, ''))) AS nombre_completo,
             p.nombre_puesto AS puesto,
             COALESCE(s.celular, s.telefono_casa, s.telefono_recados) AS telefono,
             'Inmediata' AS disponibilidad,
-            INITCAP(s.estatus) AS estatus,
+            INITCAP(s.estatus) AS estatus,  -- CORREGIDO: INITCAP en lugar de INITCAP
             TO_CHAR(s.fecha_registro, 'DD/MM/YYYY') AS fecha_solicitud
         FROM solicitud s
         LEFT JOIN cat_puestos p ON s.id_puesto = p.id_puesto
@@ -33,14 +33,16 @@ try {
 
     // Agregar filtro por estado
     if (!empty($filtro_estado)) {
-        $sql .= " AND LOWER(s.estatus) = :estado";
-        $params[':estado'] = strtolower($filtro_estado);
+        $sql .= " AND LOWER(s.estatus) = LOWER(:estado)";
+        $params[':estado'] = $filtro_estado;
     }
 
     // Agregar filtro por búsqueda (nombre o puesto)
     if (!empty($filtro_busqueda)) {
-        $sql .= " AND (LOWER(CONCAT(s.nombre, ' ', s.apellido_paterno, ' ', COALESCE(s.apellido_materno, ''))) LIKE :busqueda 
-                  OR LOWER(p.nombre_puesto) LIKE :busqueda2)";
+        $sql .= " AND (
+            LOWER(CONCAT(s.nombre, ' ', s.apellido_paterno, ' ', COALESCE(s.apellido_materno, ''))) LIKE :busqueda 
+            OR LOWER(p.nombre_puesto) LIKE :busqueda2
+        )";
         $params[':busqueda'] = '%' . strtolower($filtro_busqueda) . '%';
         $params[':busqueda2'] = '%' . strtolower($filtro_busqueda) . '%';
     }
@@ -70,27 +72,27 @@ try {
     echo '<head><meta charset="UTF-8"></head>';
     echo '<body>';
 
-    // Información de los filtros aplicados
+    // Información de los filtros aplicados - IGUAL A LA IMAGEN
     echo '<table border="0" cellpadding="2" cellspacing="0">';
-    echo '<tr><td colspan="8" style="font-size: 14px; font-weight: bold;">Reporte de Solicitudes - TÁCTICA 8</td></tr>';
-    echo '<tr><td colspan="8">Fecha de exportación: ' . date('d/m/Y H:i:s') . '</td></tr>';
+    echo '<tr><td colspan="7" style="font-size: 14px; font-weight: bold;">Reporte de Solicitudes - TÁCTICA 8</td></tr>';
+    echo '<tr><td colspan="7">Fecha de exportación: ' . date('d/m/Y H:i:s') . '</td></tr>';
     
     if (!empty($filtro_estado) || !empty($filtro_busqueda)) {
-        echo '<tr><td colspan="8">Filtros aplicados: ';
+        echo '<tr><td colspan="7">Filtros aplicados: ';
         $filtros_aplicados = array();
         if (!empty($filtro_estado)) $filtros_aplicados[] = 'Estado: ' . ucfirst($filtro_estado);
-        if (!empty($filtro_busqueda)) $filtros_aplicados[] = 'Búsqueda: "' . $filtro_busqueda . '"';
+        if (!empty($filtro_busqueda)) $filtros_aplicados[] = 'Búsqueda: "' . htmlspecialchars($filtro_busqueda) . '"';
         echo implode(' | ', $filtros_aplicados);
         echo '</td></tr>';
     }
     
-    echo '<tr><td colspan="8">&nbsp;</td></tr>';
+    echo '<tr><td colspan="7">&nbsp;</td></tr>';
     echo '</table>';
 
     // Iniciar la tabla de datos
     echo '<table border="1" cellpadding="4" cellspacing="0">';
 
-    // Encabezados de columna - IGUALES A LOS DE LA VISTA
+    // Encabezados de columna - IGUALES A LA IMAGEN
     echo '<tr style="background-color: #4CAF50; color: white; font-weight: bold;">';
     echo '<th>ID</th>';
     echo '<th>Nombre Completo</th>';
@@ -105,13 +107,13 @@ try {
     if (count($solicitudes) > 0) {
         foreach ($solicitudes as $solicitud) {
             echo '<tr>';
-            echo '<td>' . $solicitud['id'] . '</td>';
-            echo '<td>' . utf8_decode($solicitud['nombre_completo']) . '</td>';
-            echo '<td>' . utf8_decode($solicitud['puesto']) . '</td>';
-            echo '<td>' . $solicitud['telefono'] . '</td>';
-            echo '<td>' . utf8_decode($solicitud['disponibilidad']) . '</td>';
-            echo '<td>' . utf8_decode($solicitud['estatus']) . '</td>';
-            echo '<td>' . $solicitud['fecha_solicitud'] . '</td>';
+            echo '<td>' . htmlspecialchars($solicitud['id']) . '</td>';
+            echo '<td>' . htmlspecialchars($solicitud['nombre_completo']) . '</td>';
+            echo '<td>' . htmlspecialchars($solicitud['puesto']) . '</td>';
+            echo '<td>' . htmlspecialchars($solicitud['telefono']) . '</td>';
+            echo '<td>' . htmlspecialchars($solicitud['disponibilidad']) . '</td>';
+            echo '<td>' . htmlspecialchars($solicitud['estatus']) . '</td>';
+            echo '<td>' . htmlspecialchars($solicitud['fecha_solicitud']) . '</td>';
             echo '</tr>';
         }
         
@@ -132,7 +134,7 @@ try {
     // Manejo de errores
     header("Content-Type: text/html; charset=utf-8");
     echo '<h3>Error al exportar datos</h3>';
-    echo '<p>' . $e->getMessage() . '</p>';
+    echo '<p>' . htmlspecialchars($e->getMessage()) . '</p>';
     echo '<p><a href="javascript:history.back()">Regresar</a></p>';
 }
 ?>
