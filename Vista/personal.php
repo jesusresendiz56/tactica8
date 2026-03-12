@@ -351,7 +351,7 @@ $responsables = $conn->query("SELECT id_responsable, nombre, puesto, estado FROM
         <!-- ===== SEGUNDO FORM-SECTION: FORMULARIO DE RESPONSABLES ===== -->
         <section class="form-section">
             <div class="responsable-form">
-                <h3>➕ Agregar Nuevo Responsable / Coordinador</h3>
+                <h3>Agregar Nuevo Responsable / Coordinador</h3>
                 
                 <?php echo $mensaje_responsable; ?>
                 
