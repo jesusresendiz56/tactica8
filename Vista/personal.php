@@ -350,33 +350,33 @@ $responsables = $conn->query("SELECT id_responsable, nombre, puesto, estado FROM
 
                             <!-- CONTRATO CON SUBIDA DE ARCHIVO -->
                             <td>
-                                <?php if ($empleado['contrato_url']): ?>
-                                    <a href="<?php echo htmlspecialchars($empleado['contrato_url']); ?>" target="_blank" style="display:block; margin-bottom:5px;">
-                                        📄 Ver contrato
-                                    </a>
-                                <?php else: ?>
-                                    <span style="color:#999; display:block; margin-bottom:5px;">Sin contrato</span>
-                                <?php endif; ?>
+    <?php if ($empleado['contrato_url']): ?>
+        <a href="../src/imagenes/contrato.png/<?php echo htmlspecialchars($empleado['contrato_url']); ?>" target="_blank" style="display:block; margin-bottom:5px;">
+            Ver contrato
+        </a>
+    <?php else: ?>
+        <span style="color:#999; display:block; margin-bottom:5px;">Sin contrato</span>
+    <?php endif; ?>
 
-                                <form action="../Controlador/subir_contrato.php"
-                                    method="POST"
-                                    enctype="multipart/form-data"
-                                    style="margin:0;">
+    <form action="../Controlador/subir_contrato.php"
+        method="POST"
+        enctype="multipart/form-data"
+        style="margin:0;">
 
-                                    <input type="hidden"
-                                        name="id_personal"
-                                        value="<?php echo $empleado['id_personal']; ?>">
+        <input type="hidden"
+            name="id_personal"
+            value="<?php echo $empleado['id_personal']; ?>">
 
-                                    <input type="file"
-                                        name="contrato"
-                                        required
-                                        style="font-size:11px; margin-bottom:5px; width:100%;">
+        <input type="file"
+            name="contrato"
+            required
+            style="font-size:11px; margin-bottom:5px; width:100%;">
 
-                                    <button type="submit" class="btn-subir">
-                                        Subir
-                                    </button>
-                                </form>
-                            </td>
+        <button type="submit" class="btn-subir">
+            Subir
+        </button>
+    </form>
+</td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
