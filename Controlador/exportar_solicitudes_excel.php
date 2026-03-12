@@ -3,6 +3,11 @@
 session_start();
 require_once '../Modelo/SupaConexion.php';
 
+// Función auxiliar para manejar valores nulos
+function safe_html($value) {
+    return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
+}
+
 // Verificar si hay sesión activa
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: ../Vista/login.php');
@@ -55,7 +60,7 @@ try {
             df.nombre_madre,
             df.numero_hijos,
             df.quien_los_cuida,
-            -- Datos de referencias (solo primera referencia para no complicar)
+            -- Datos de referencias
             (SELECT STRING_AGG(CONCAT(nombre, ' (', parentesco, ': ', telefono, ')'), ' | ') 
              FROM referencias r 
              WHERE r.id_solicitud = s.id_solicitud) AS referencias
@@ -63,12 +68,12 @@ try {
         LEFT JOIN cat_puestos p ON s.id_puesto = p.id_puesto
         LEFT JOIN direcciones d ON s.id_solicitud = d.id_solicitud
         LEFT JOIN datos_familiares df ON s.id_solicitud = df.id_solicitud
-        WHERE LOWER(s.estatus) = 'aprobada'  -- SOLO SOLICITUDES APROBADAS
+        WHERE LOWER(s.estatus) = 'aprobada'
     ";
 
     $params = array();
 
-    // Agregar filtro por búsqueda (nombre o puesto)
+    // Agregar filtro por búsqueda
     if (!empty($filtro_busqueda)) {
         $sql .= " AND (
             LOWER(CONCAT(s.nombre, ' ', s.apellido_paterno, ' ', COALESCE(s.apellido_materno, ''))) LIKE :busqueda 
@@ -108,106 +113,75 @@ try {
 
     // Encabezado del reporte
     echo '<table border="0" cellpadding="2" cellspacing="0">';
-    echo '<tr><td colspan="30" style="font-size: 14px; font-weight: bold;">Reporte COMPLETO de Solicitudes Aprobadas - TÁCTICA 8</td></tr>';
-    echo '<tr><td colspan="30">Fecha de exportación: ' . date('d/m/Y H:i:s') . '</td></tr>';
+    echo '<tr><td colspan="37" style="font-size: 14px; font-weight: bold;">Reporte COMPLETO de Solicitudes Aprobadas - TÁCTICA 8</td></tr>';
+    echo '<tr><td colspan="37">Fecha de exportación: ' . date('d/m/Y H:i:s') . '</td></tr>';
     
-    // Mostrar filtros aplicados
     if (!empty($filtro_busqueda)) {
-        echo '<tr><td colspan="30">Filtros aplicados: Búsqueda: "' . htmlspecialchars($filtro_busqueda) . '"</td></tr>';
+        echo '<tr><td colspan="37">Filtros aplicados: Búsqueda: "' . safe_html($filtro_busqueda) . '"</td></tr>';
     }
     
-    echo '<tr><td colspan="30">&nbsp;</td></tr>';
+    echo '<tr><td colspan="37">&nbsp;</td></tr>';
     echo '</table>';
 
     // Tabla principal
     echo '<table border="1" cellpadding="4" cellspacing="0">';
 
-    // ENCABEZADOS - TODOS LOS CAMPOS
+    // ENCABEZADOS
     echo '<tr style="background-color: #4CAF50; color: white; font-weight: bold;">';
-    echo '<th>ID</th>';
-    echo '<th>Nombre Completo</th>';
-    echo '<th>Puesto</th>';
-    echo '<th>Nombre</th>';
-    echo '<th>Apellido Paterno</th>';
-    echo '<th>Apellido Materno</th>';
-    echo '<th>Fecha Nacimiento</th>';
-    echo '<th>Sexo</th>';
-    echo '<th>Estado Civil</th>';
-    echo '<th>RFC</th>';
-    echo '<th>CURP</th>';
-    echo '<th>IMSS</th>';
-    echo '<th>Grado Estudios</th>';
-    echo '<th>Celular</th>';
-    echo '<th>Teléfono Casa</th>';
-    echo '<th>Teléfono Recados</th>';
-    echo '<th>Correo</th>';
-    echo '<th>Lugar Nacimiento</th>';
-    echo '<th>Tipo Sangre</th>';
-    echo '<th>Salario Deseado</th>';
-    echo '<th>Infonavit</th>';
-    echo '<th>Fonacot</th>';
-    echo '<th>Autorización Datos</th>';
-    echo '<th>Disponibilidad</th>';
-    echo '<th>Estatus</th>';
-    echo '<th>Fecha Solicitud</th>';
-    echo '<th>Calle</th>';
-    echo '<th>Colonia</th>';
-    echo '<th>Ciudad</th>';
-    echo '<th>Municipio</th>';
-    echo '<th>Estado (Dirección)</th>';
-    echo '<th>CP</th>';
-    echo '<th>Nombre Padre</th>';
-    echo '<th>Nombre Madre</th>';
-    echo '<th>Número Hijos</th>';
-    echo '<th>Quien los Cuida</th>';
-    echo '<th>Referencias</th>';
+    echo '<th>ID</th><th>Nombre Completo</th><th>Puesto</th><th>Nombre</th><th>Apellido Paterno</th>';
+    echo '<th>Apellido Materno</th><th>Fecha Nacimiento</th><th>Sexo</th><th>Estado Civil</th><th>RFC</th>';
+    echo '<th>CURP</th><th>IMSS</th><th>Grado Estudios</th><th>Celular</th><th>Teléfono Casa</th>';
+    echo '<th>Teléfono Recados</th><th>Correo</th><th>Lugar Nacimiento</th><th>Tipo Sangre</th>';
+    echo '<th>Salario Deseado</th><th>Infonavit</th><th>Fonacot</th><th>Autorización Datos</th>';
+    echo '<th>Disponibilidad</th><th>Estatus</th><th>Fecha Solicitud</th><th>Calle</th><th>Colonia</th>';
+    echo '<th>Ciudad</th><th>Municipio</th><th>Estado (Dirección)</th><th>CP</th><th>Nombre Padre</th>';
+    echo '<th>Nombre Madre</th><th>Número Hijos</th><th>Quien los Cuida</th><th>Referencias</th>';
     echo '</tr>';
 
     // DATOS
     if (count($solicitudes) > 0) {
         foreach ($solicitudes as $s) {
             echo '<tr>';
-            echo '<td>' . htmlspecialchars($s['id']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['nombre_completo']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['puesto']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['nombre']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['apellido_paterno']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['apellido_materno']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['fecha_nacimiento']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['sexo']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['estado_civil']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['rfc']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['curp']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['imss']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['grado_estudios']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['celular']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['telefono_casa']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['telefono_recados']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['correo']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['lugar_nacimiento']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['tipo_sangre']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['salario_deseado']) . '</td>';
+            echo '<td>' . safe_html($s['id']) . '</td>';
+            echo '<td>' . safe_html($s['nombre_completo']) . '</td>';
+            echo '<td>' . safe_html($s['puesto']) . '</td>';
+            echo '<td>' . safe_html($s['nombre']) . '</td>';
+            echo '<td>' . safe_html($s['apellido_paterno']) . '</td>';
+            echo '<td>' . safe_html($s['apellido_materno']) . '</td>';
+            echo '<td>' . safe_html($s['fecha_nacimiento']) . '</td>';
+            echo '<td>' . safe_html($s['sexo']) . '</td>';
+            echo '<td>' . safe_html($s['estado_civil']) . '</td>';
+            echo '<td>' . safe_html($s['rfc']) . '</td>';
+            echo '<td>' . safe_html($s['curp']) . '</td>';
+            echo '<td>' . safe_html($s['imss']) . '</td>';
+            echo '<td>' . safe_html($s['grado_estudios']) . '</td>';
+            echo '<td>' . safe_html($s['celular']) . '</td>';
+            echo '<td>' . safe_html($s['telefono_casa']) . '</td>';
+            echo '<td>' . safe_html($s['telefono_recados']) . '</td>';
+            echo '<td>' . safe_html($s['correo']) . '</td>';
+            echo '<td>' . safe_html($s['lugar_nacimiento']) . '</td>';
+            echo '<td>' . safe_html($s['tipo_sangre']) . '</td>';
+            echo '<td>' . safe_html($s['salario_deseado']) . '</td>';
             echo '<td>' . ($s['credito_infonavit'] ? 'Sí' : 'No') . '</td>';
             echo '<td>' . ($s['credito_fonacot'] ? 'Sí' : 'No') . '</td>';
             echo '<td>' . ($s['autorizacion_datos'] ? 'Sí' : 'No') . '</td>';
-            echo '<td>' . htmlspecialchars($s['disponibilidad']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['estatus']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['fecha_solicitud']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['calle']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['colonia']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['ciudad']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['municipio']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['estado_direccion']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['cp']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['nombre_padre']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['nombre_madre']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['numero_hijos']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['quien_los_cuida']) . '</td>';
-            echo '<td>' . htmlspecialchars($s['referencias']) . '</td>';
+            echo '<td>' . safe_html($s['disponibilidad']) . '</td>';
+            echo '<td>' . safe_html($s['estatus']) . '</td>';
+            echo '<td>' . safe_html($s['fecha_solicitud']) . '</td>';
+            echo '<td>' . safe_html($s['calle']) . '</td>';
+            echo '<td>' . safe_html($s['colonia']) . '</td>';
+            echo '<td>' . safe_html($s['ciudad']) . '</td>';
+            echo '<td>' . safe_html($s['municipio']) . '</td>';
+            echo '<td>' . safe_html($s['estado_direccion']) . '</td>';
+            echo '<td>' . safe_html($s['cp']) . '</td>';
+            echo '<td>' . safe_html($s['nombre_padre']) . '</td>';
+            echo '<td>' . safe_html($s['nombre_madre']) . '</td>';
+            echo '<td>' . safe_html($s['numero_hijos']) . '</td>';
+            echo '<td>' . safe_html($s['quien_los_cuida']) . '</td>';
+            echo '<td>' . safe_html($s['referencias']) . '</td>';
             echo '</tr>';
         }
         
-        // Total
         echo '<tr style="background-color: #f2f2f2; font-weight: bold;">';
         echo '<td colspan="37" align="right">Total de solicitudes aprobadas: ' . count($solicitudes) . '</td>';
         echo '</tr>';
@@ -221,10 +195,9 @@ try {
     echo '</html>';
 
 } catch (PDOException $e) {
-    // Manejo de errores
     header("Content-Type: text/html; charset=utf-8");
     echo '<h3>Error al exportar datos</h3>';
-    echo '<p>' . htmlspecialchars($e->getMessage()) . '</p>';
+    echo '<p>' . safe_html($e->getMessage()) . '</p>';
     echo '<p><a href="javascript:history.back()">Regresar</a></p>';
 }
 ?>
