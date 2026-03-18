@@ -3,9 +3,9 @@ session_start();
 require_once '../Modelo/SupaConexion.php';
 
 // Configuración 
-$SUPABASE_URL = 'https://fbhirrxvzubnwnivrarl.supabase.co';  // ← la URL
-$SUPABASE_KEY = 'anon public: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZiaGlycnh2enVibnduaXZyYXJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNDM5MzAsImV4cCI6MjA4NTcxOTkzMH0.-9BDLJn1rlpmkAqtIGhC31vbLyGT5pCBU2r1t1reWb4';  // ← APi KEY
-$BUCKET_NAME = 'contratos';  // Nombre del bucket en Supabase
+$SUPABASE_URL = 'https://fbhirrxvzubnwnivrarl.supabase.co';
+$SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZiaGlycnh2enVibnduaXZyYXJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNDM5MzAsImV4cCI6MjA4NTcxOTkzMH0.-9BDLJn1rlpmkAqtIGhC31vbLyGT5pCBU2r1t1reWb4';
+$BUCKET_NAME = 'contratos';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['contrato'])) {
     
@@ -100,8 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['contrato'])) {
         $_SESSION['error'] = "Error: " . $e->getMessage();
     }
     
-    // Redireccionar
-    header("Location: ../Vista/personal.php?id=" . $id_personal);
+    // Redireccionar a personal.php (CORREGIDO)
+    header("Location: ../Vista/personal.php");
     exit();
 }
 
