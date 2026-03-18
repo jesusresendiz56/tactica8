@@ -2,10 +2,10 @@
 session_start();
 require_once '../Modelo/SupaConexion.php';
 
-// Configuración DIRECTA de Supabase (CAMBIA ESTOS VALORES)
-$SUPABASE_URL = 'https://fbhirrxvzubnwnivrarl.supabase.co';  // ← TU URL
-$SUPABASE_KEY = 'anon public: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZiaGlycnh2enVibnduaXZyYXJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNDM5MzAsImV4cCI6MjA4NTcxOTkzMH0.-9BDLJn1rlpmkAqtIGhC31vbLyGT5pCBU2r1t1reWb4';  // ← TU KEY
-$BUCKET_NAME = 'contratos';  // Nombre del bucket
+// Configuración 
+$SUPABASE_URL = 'https://fbhirrxvzubnwnivrarl.supabase.co';  // ← la URL
+$SUPABASE_KEY = 'anon public: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZiaGlycnh2enVibnduaXZyYXJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNDM5MzAsImV4cCI6MjA4NTcxOTkzMH0.-9BDLJn1rlpmkAqtIGhC31vbLyGT5pCBU2r1t1reWb4';  // ← APi KEY
+$BUCKET_NAME = 'contratos';  // Nombre del bucket en Supabase
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['contrato'])) {
     
