@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['contrato'])) {
     }
     
     // Redireccionar
-    header("Location: ../Vista/detalle_personal.php?id=" . $id_personal);
+    header("Location: ../Vista/personal.php?id=" . $id_personal);
     exit();
 }
 
