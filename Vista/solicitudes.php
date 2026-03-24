@@ -1,193 +1,114 @@
 <?php
-// reportes.php
+// Vista/solicitudes.php
 session_start();
-
-// VERIFICACIÓN DE SESIÓN
-if (!isset($_SESSION['id_usuario'])) {
-    header('Location: login.php?error=no_sesion');
-    exit();
-}
-
 require_once '../Modelo/SupaConexion.php'; // Conexión PostgreSQL con PDO
 
-// Obtener información del usuario
-$usuario_nombre = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Administrador';
-$usuario_correo = isset($_SESSION['correo']) ? $_SESSION['correo'] : 'admin@gmail.com';
-
-// Obtener estadísticas de solicitudes aprobadas
-$sql_stats = "
+// Obtener todas las solicitudes con JOIN a cat_puestos
+$sql = "
     SELECT 
-        COUNT(*) as total_aprobadas,
-        COUNT(DISTINCT p.id_puesto) as puestos_diferentes
+        s.id_solicitud AS id,
+        CONCAT(s.nombre, ' ', s.apellido_paterno, ' ', COALESCE(s.apellido_materno, '')) AS nombre_completo,
+        p.nombre_puesto AS puesto,
+        COALESCE(s.celular, s.telefono_casa, s.telefono_recados) AS telefono,
+        'Inmediata' AS disponibilidad,
+        LOWER(s.estatus) AS estatus,
+        TO_CHAR(s.fecha_registro, 'DD/MM/YYYY') AS fecha_solicitud
     FROM solicitud s
     LEFT JOIN cat_puestos p ON s.id_puesto = p.id_puesto
-    WHERE LOWER(s.estatus) = 'aprobada'
+    ORDER BY s.fecha_registro DESC
 ";
 
-$stmt_stats = $conn->query($sql_stats);
-$stats = $stmt_stats->fetch(PDO::FETCH_ASSOC);
-$total_aprobadas = $stats['total_aprobadas'] ?? 0;
-$puestos_diferentes = $stats['puestos_diferentes'] ?? 0;
-?>
+$stmt = $conn->query($sql);
+$solicitudes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Estadísticas
+$total_solicitudes = count($solicitudes);
+$pendientes = 0;
+$aprobadas = 0;
+$rechazadas = 0;
+
+foreach ($solicitudes as $solicitud) {
+    switch ($solicitud['estatus']) {
+        case 'pendiente':
+            $pendientes++;
+            break;
+        case 'aprobada':
+            $aprobadas++;
+            break;
+        case 'rechazada':
+            $rechazadas++;
+            break;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <title>Reportes | TÁCTICA 8</title>
+    <title>Solicitudes | TÁCTICA 8</title>
     <link rel="icon" type="image/png" href="../src/imagenes/favicon.png">
     <link rel="stylesheet" href="../src/estilos/estilos.css">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
     <script src="../src/js/seguridad.js" defer></script>
     <style>
-        /* Estilos adicionales para la sección de reportes */
-        .reportes-container {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .estadisticas {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .estadistica-card {
-            flex: 1;
-            min-width: 200px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
+        /* Estilos adicionales para las columnas de acciones y exportación */
+        .accion-columna {
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            vertical-align: middle;
+            width: 50px;
         }
-        
-        .estadistica-card.total {
-            background: linear-gradient(135deg, #EC1F27 0%, #c41e24 100%);
-        }
-        
-        .estadistica-card.puestos {
-            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-        }
-        
-        .estadistica-card .numero {
-            font-size: 36px;
+
+        .accion-deshabilitada {
+            color: #ccc;
             font-weight: bold;
-            display: block;
-            margin-bottom: 10px;
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
         }
-        
-        .estadistica-card .texto {
-            font-size: 16px;
-            opacity: 0.9;
+
+        table td {
+            padding: 8px 5px;
         }
-        
-        .exportar-section {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        
-        .exportar-section h3 {
-            margin-top: 0;
-            color: #333;
-            margin-bottom: 15px;
-        }
-        
-        .btn-exportar-excel {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .btn-exportar-excel:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        
-        .btn-exportar-excel:active {
-            transform: translateY(0);
-        }
-        
-        .info-exportacion {
-            margin-top: 15px;
-            padding: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
-            font-size: 14px;
-            color: #495057;
-        }
-        
-        .info-exportacion i {
-            font-style: normal;
-            font-weight: bold;
-        }
-        
-        .filtros-reportes {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
+
+        /* Estilos para filtros y botón de exportar */
+        .filtros {
             display: flex;
             gap: 10px;
+            align-items: center;
             flex-wrap: wrap;
-            align-items: flex-end;
+            margin-bottom: 20px;
         }
-        
-        .filtros-reportes .grupo-filtro {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .filtros-reportes label {
-            display: block;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #495057;
-        }
-        
-        .filtros-reportes input,
-        .filtros-reportes select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ced4da;
+
+        .filtros input,
+        .filtros select,
+        .filtros button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
         }
-        
-        .btn-filtrar {
+
+        .filtros button {
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 8px 20px;
-            border-radius: 4px;
             cursor: pointer;
-            height: 38px;
+            transition: background-color 0.3s;
         }
-        
-        .btn-filtrar:hover {
+
+        .filtros button:hover {
             background-color: #0056b3;
+        }
+
+        .btn-exportar {
+            background-color: #28a745 !important;
+            margin-left: 10px;
+        }
+
+        .btn-exportar:hover {
+            background-color: #218838 !important;
         }
     </style>
 </head>
@@ -200,158 +121,195 @@ $puestos_diferentes = $stats['puestos_diferentes'] ?? 0;
                 <img src="../src/imagenes/tactica_logo.png" alt="TÁCTICA 8" class="logo-img" width="100" height="100">
             </a>
         </div>
-
         <div class="header-center-text">
             <strong>Agencia de Servicios Especializados en Marketing con REPSE.</strong><br>
             Más de 40 años de experiencia.
         </div>
-
         <div class="header-exit">
-            <div class="user-info-container" style="margin-right: 15px; text-align: right;">
-                <span class="user-name" style="display: block; color: white; font-weight: bold;">
-                    <?php echo htmlspecialchars($usuario_nombre); ?>
-                </span>
-                <span class="user-email" style="display: block; color: white; font-size: 12px; opacity: 0.8;">
-                    <?php echo htmlspecialchars($usuario_correo); ?>
-                </span>
-            </div>
-            <a href="../Controlador/logout.php" class="logout-link" onclick="return confirm('¿Estás seguro de cerrar sesión?')">
-                <img src="../src/imagenes/logout.png" width="30" alt="Cerrar Sesión">
+            <a href="login.php">
+                <img src="../src/imagenes/logout.png" alt="Salir" class="exit-icon" width="30" height="30">
             </a>
         </div>
     </header>
 
-    <!-- ===== MENÚ ===== -->
+    <!-- ===== MENÚ LATERAL ===== -->
     <nav class="menu">
         <a href="../index.php">Dashboard</a>
         <a href="../Vista/campañas.php">Campañas</a>
         <a href="../Vista/personal.php">Personal</a>
         <a href="../Vista/asignaciones.php">Asignaciones</a>
-        <a href="../Vista/reportes.php" class="active">Reportes</a>
-        <a href="../Vista/solicitudes.php">Solicitudes</a>
+        <a href="../Vista/reportes.php">Reportes</a>
+        <a href="../Vista/solicitudes.php" class="active">Solicitudes</a>
     </nav>
 
     <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <main class="content">
         <section class="form-section">
-            <h1>Reportes de Solicitudes Aprobadas</h1>
-            
-            <div class="reportes-container">
-                <!-- Tarjetas de estadísticas -->
-                <div class="estadisticas">
-                    <div class="estadistica-card total">
-                        <span class="numero"><?php echo $total_aprobadas; ?></span>
-                        <span class="texto">Solicitudes Aprobadas</span>
-                    </div>
-                    <div class="estadistica-card puestos">
-                        <span class="numero"><?php echo $puestos_diferentes; ?></span>
-                        <span class="texto">Puestos Diferentes</span>
-                    </div>
+            <h1>Gestión de Solicitudes</h1>
+            <div class="contadores">
+                <div class="contador contador-total">
+                    <span class="numero"><?php echo $total_solicitudes; ?></span>
+                    <span class="texto">Total Solicitudes</span>
                 </div>
-
-                <!-- Sección de filtros y exportación -->
-                <div class="exportar-section">
-                    <h3>Exportar Reporte de Solicitudes Aprobadas</h3>
-                    
-                    <div class="filtros-reportes">
-                        <div class="grupo-filtro">
-                            <label for="searchInput">Buscar por nombre, puesto, RFC o CURP:</label>
-                            <input type="text" id="searchInput" placeholder="Ej: Juan Pérez, Administrador, RFC123...">
-                        </div>
-                        
-                        <div class="grupo-filtro">
-                            <label>&nbsp;</label>
-                            <button onclick="exportarAExcel()" class="btn-exportar-excel">
-                                📊 Exportar a Excel
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="info-exportacion">
-                        <i>ℹ️ Información:</i> Se exportarán todas las solicitudes con estatus APROBADA, incluyendo todos los campos: datos personales, dirección, datos familiares y referencias.
-                        <?php if($total_aprobadas > 0): ?>
-                            <strong><?php echo $total_aprobadas; ?></strong> solicitudes disponibles para exportar.
-                        <?php else: ?>
-                            <strong>No hay solicitudes aprobadas</strong> para exportar en este momento.
-                        <?php endif; ?>
-                    </div>
+                <div class="contador contador-pendientes">
+                    <span class="numero"><?php echo $pendientes; ?></span>
+                    <span class="texto">Pendientes</span>
                 </div>
-
-                <!-- Lista resumen de solicitudes aprobadas (opcional) -->
-                <div class="exportar-section" style="margin-top: 20px;">
-                    <h3>Últimas Solicitudes Aprobadas</h3>
-                    <?php
-                    // Mostrar las últimas 10 solicitudes aprobadas como resumen
-                    $sql_resumen = "
-                        SELECT 
-                            s.id_solicitud,
-                            CONCAT(s.nombre, ' ', s.apellido_paterno, ' ', COALESCE(s.apellido_materno, '')) AS nombre_completo,
-                            p.nombre_puesto AS puesto,
-                            TO_CHAR(s.fecha_registro, 'DD/MM/YYYY') AS fecha_aprobacion
-                        FROM solicitud s
-                        LEFT JOIN cat_puestos p ON s.id_puesto = p.id_puesto
-                        WHERE LOWER(s.estatus) = 'aprobada'
-                        ORDER BY s.fecha_registro DESC
-                        LIMIT 10
-                    ";
-                    $stmt_resumen = $conn->query($sql_resumen);
-                    $ultimas_solicitudes = $stmt_resumen->fetchAll(PDO::FETCH_ASSOC);
-                    ?>
-                    
-                    <?php if(count($ultimas_solicitudes) > 0): ?>
-                        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                            <thead>
-                                <tr style="background-color: #f2f2f2;">
-                                    <th style="padding: 8px; border: 1px solid #ddd;">ID</th>
-                                    <th style="padding: 8px; border: 1px solid #ddd;">Nombre Completo</th>
-                                    <th style="padding: 8px; border: 1px solid #ddd;">Puesto</th>
-                                    <th style="padding: 8px; border: 1px solid #ddd;">Fecha de Aprobación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach($ultimas_solicitudes as $solicitud): ?>
-                                <tr>
-                                    <td style="padding: 8px; border: 1px solid #ddd;"><?php echo $solicitud['id_solicitud']; ?></td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;"><?php echo htmlspecialchars($solicitud['nombre_completo']); ?></td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;"><?php echo htmlspecialchars($solicitud['puesto']); ?></td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;"><?php echo $solicitud['fecha_aprobacion']; ?></td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    <?php else: ?>
-                        <p style="text-align: center; padding: 20px;">No hay solicitudes aprobadas para mostrar.</p>
-                    <?php endif; ?>
+                <div class="contador contador-aprobadas">
+                    <span class="numero"><?php echo $aprobadas; ?></span>
+                    <span class="texto">Aprobadas</span>
+                </div>
+                <div class="contador contador-rechazadas">
+                    <span class="numero"><?php echo $rechazadas; ?></span>
+                    <span class="texto">Rechazadas</span>
                 </div>
             </div>
+        </section>
+
+        <section class="table-section">
+            <div class="filtros">
+                <input type="text" id="searchInput" placeholder="Buscar por nombre o puesto...">
+                <select id="filterStatus">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="aprobada">Aprobada</option>
+                    <option value="rechazada">Rechazada</option>
+                </select>
+                <button onclick="filtrarTabla()">Buscar</button>
+                <button onclick="exportarAExcel()" class="btn-exportar"> Exportar a Excel</button>
+            </div>
+
+            <table id="tablaSolicitudes">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Puesto</th>
+                        <th>Teléfono</th>
+                        <th>Disponibilidad</th>
+                        <th>Estatus</th>
+                        <th>Fecha de Solicitud</th>
+                        <th>Ver</th>
+                        <th>Aceptar</th>
+                        <th>Rechazar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($solicitudes) > 0): ?>
+                        <?php foreach ($solicitudes as $solicitud): ?>
+                            <?php
+                            $clase_estado = 'estado-' . $solicitud['estatus'];
+                            $estado_texto = ucfirst($solicitud['estatus']);
+                            ?>
+                            <tr>
+                                <td><?php echo $solicitud['id']; ?></td>
+                                <td><?php echo $solicitud['nombre_completo']; ?></td>
+                                <td><?php echo $solicitud['puesto']; ?></td>
+                                <td><?php echo $solicitud['telefono']; ?></td>
+                                <td><?php echo $solicitud['disponibilidad']; ?></td>
+                                <td><span class="estado-badge <?php echo $clase_estado; ?>"><?php echo $estado_texto; ?></span></td>
+                                <td><?php echo $solicitud['fecha_solicitud']; ?></td>
+                                <td class="accion-columna">
+                                    <a href="ver_solicitud.php?id=<?php echo $solicitud['id']; ?>"
+                                        class="btn-accion btn-ver" title="Ver detalles">
+                                        <img src="../src/imagenes/ver.png" alt="Ver" width="24" height="24">
+                                    </a>
+                                </td>
+                                <td class="accion-columna">
+                                    <?php if ($solicitud['estatus'] == 'pendiente'): ?>
+                                        <a href="../Controlador/engine_procesar_solicitud.php?accion=aceptar&id=<?php echo $solicitud['id']; ?>"
+                                            class="btn-accion btn-aceptar"
+                                            onclick="return confirm('¿Aceptar esta solicitud?')"
+                                            title="Aceptar solicitud">
+                                            <img src="../src/imagenes/aceptar.png" alt="Aceptar" width="24" height="24">
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="accion-deshabilitada">-</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="accion-columna">
+                                    <?php if ($solicitud['estatus'] == 'pendiente'): ?>
+                                        <a href="../Controlador/engine_procesar_solicitud.php?accion=rechazar&id=<?php echo $solicitud['id']; ?>"
+                                            class="btn-accion btn-rechazar"
+                                            onclick="return confirm('¿Rechazar esta solicitud?')"
+                                            title="Rechazar solicitud">
+                                            <img src="../src/imagenes/rechazar.png" alt="Rechazar" width="24" height="24">
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="accion-deshabilitada">-</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="10" style="text-align: center; padding: 20px;">No hay solicitudes de empleo registradas.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </section>
     </main>
 
     <script>
+        function filtrarTabla() {
+            var input = document.getElementById('searchInput');
+            var filterStatus = document.getElementById('filterStatus');
+            var table = document.getElementById('tablaSolicitudes');
+            var tr = table.getElementsByTagName('tr');
+
+            var searchText = input.value.toLowerCase();
+            var statusValue = filterStatus.value.toLowerCase();
+
+            for (var i = 1; i < tr.length; i++) {
+                var tdNombre = tr[i].getElementsByTagName('td')[1];
+                var tdPuesto = tr[i].getElementsByTagName('td')[2];
+                var tdStatus = tr[i].getElementsByTagName('td')[5];
+
+                if (tdNombre && tdPuesto && tdStatus) {
+                    var nombre = tdNombre.textContent || tdNombre.innerText;
+                    var puesto = tdPuesto.textContent || tdPuesto.innerText;
+                    var status = tdStatus.textContent || tdStatus.innerText;
+
+                    var matchSearch = nombre.toLowerCase().indexOf(searchText) > -1 || puesto.toLowerCase().indexOf(searchText) > -1;
+                    var matchStatus = statusValue === '' || status.toLowerCase().indexOf(statusValue) > -1;
+
+                    tr[i].style.display = (matchSearch && matchStatus) ? '' : 'none';
+                }
+            }
+        }
+
         function exportarAExcel() {
-            // Obtener los valores de los filtros
+            // Obtener los valores actuales de los filtros
             var searchText = document.getElementById('searchInput').value;
-            
+            var filterStatus = document.getElementById('filterStatus').value;
+
             // Construir la URL con los filtros
             var url = '../Controlador/exportar_solicitudes_excel.php?';
-            
+
             if (searchText) {
-                url += 'busqueda=' + encodeURIComponent(searchText);
+                url += 'busqueda=' + encodeURIComponent(searchText) + '&';
             }
-            
+
+            if (filterStatus) {
+                url += 'estado=' + encodeURIComponent(filterStatus) + '&';
+            }
+
             // Eliminar el último & si existe
             url = url.replace(/&$/, '');
-            
+
             // Redireccionar para descargar el archivo
             window.location.href = url;
         }
-        
-        // Event listener para el Enter en el campo de búsqueda
+
+        // Event listeners
         document.getElementById('searchInput').addEventListener('keyup', function(e) {
             if (e.key === 'Enter') {
-                exportarAExcel();
+                filtrarTabla();
             }
         });
+
+        document.getElementById('filterStatus').addEventListener('change', filtrarTabla);
     </script>
 </body>
 
