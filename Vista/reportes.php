@@ -254,21 +254,17 @@ $puestos_diferentes = $stats['puestos_diferentes'] ?? 0;
                     <h3>Exportar Reporte de Solicitudes Aprobadas</h3>
                     
                     <div class="filtros-reportes">
-                        <div class="grupo-filtro">
-                            <label for="searchInput">Buscar por nombre, puesto, RFC o CURP:</label>
-                            <input type="text" id="searchInput" placeholder="Ej: Juan Pérez, Administrador, RFC123...">
-                        </div>
-                        
-                        <div class="grupo-filtro">
-                            <label>&nbsp;</label>
-                            <button onclick="exportarAExcel()" class="btn-exportar-excel">
-                                📊 Exportar a Excel
-                            </button>
-                        </div>
-                    </div>
+    <div class="grupo-filtro">
+        <label>&nbsp;</label>
+        <button onclick="exportarAExcel()" class="btn-exportar-excel">
+            <img src="../src/imagenes/excel.png" width="20" alt="Excel">
+            Exportar a Excel
+        </button>
+    </div>
+</div>
                     
                     <div class="info-exportacion">
-                        <i>ℹ️ Información:</i> Se exportarán todas las solicitudes con estatus APROBADA, incluyendo todos los campos: datos personales, dirección, datos familiares y referencias.
+                        <i>ℹInformación:</i> Se exportarán todas las solicitudes con estatus APROBADA, incluyendo todos los campos: datos personales, dirección, datos familiares y referencias.
                         <?php if($total_aprobadas > 0): ?>
                             <strong><?php echo $total_aprobadas; ?></strong> solicitudes disponibles para exportar.
                         <?php else: ?>
