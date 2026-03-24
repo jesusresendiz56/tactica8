@@ -99,7 +99,7 @@ $usuario_correo = $_SESSION['correo'] ?? 'admin@gmail.com';
 
 <main class="content">
     <section class="form-section">
-        <h1>Exportar Reporte</h1>
+        <h1>Exportar Excel</h1>
 
         <div class="reportes-container">
             <div class="exportar-section">
