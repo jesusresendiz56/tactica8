@@ -232,12 +232,12 @@ $responsables = $conn->query("SELECT id_responsable, nombre, puesto, estado FROM
                     <div class="form-row">
                         <div class="form-group">
                             <label>Nombre completo *</label>
-                            <input type="text" name="nombre" required placeholder="Ej: Juan Pérez López">
+                            <input type="text" name="nombre" required placeholder="">
                         </div>
                         
                         <div class="form-group">
                             <label>Puesto *</label>
-                            <input type="text" name="puesto" required placeholder="Ej: Coordinador de campañas">
+                            <input type="text" name="puesto" required placeholder="">
                         </div>
                         
                         <div class="form-group">
