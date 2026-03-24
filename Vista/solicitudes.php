@@ -176,7 +176,7 @@ foreach ($solicitudes as $solicitud) {
                     <option value="rechazada">Rechazada</option>
                 </select>
                 <button onclick="filtrarTabla()">Buscar</button>
-                <button onclick="exportarAExcel()" class="btn-exportar"> Exportar a Excel</button>
+                
             </div>
 
             <table id="tablaSolicitudes">
@@ -251,66 +251,7 @@ foreach ($solicitudes as $solicitud) {
         </section>
     </main>
 
-    <script>
-        function filtrarTabla() {
-            var input = document.getElementById('searchInput');
-            var filterStatus = document.getElementById('filterStatus');
-            var table = document.getElementById('tablaSolicitudes');
-            var tr = table.getElementsByTagName('tr');
 
-            var searchText = input.value.toLowerCase();
-            var statusValue = filterStatus.value.toLowerCase();
-
-            for (var i = 1; i < tr.length; i++) {
-                var tdNombre = tr[i].getElementsByTagName('td')[1];
-                var tdPuesto = tr[i].getElementsByTagName('td')[2];
-                var tdStatus = tr[i].getElementsByTagName('td')[5];
-
-                if (tdNombre && tdPuesto && tdStatus) {
-                    var nombre = tdNombre.textContent || tdNombre.innerText;
-                    var puesto = tdPuesto.textContent || tdPuesto.innerText;
-                    var status = tdStatus.textContent || tdStatus.innerText;
-
-                    var matchSearch = nombre.toLowerCase().indexOf(searchText) > -1 || puesto.toLowerCase().indexOf(searchText) > -1;
-                    var matchStatus = statusValue === '' || status.toLowerCase().indexOf(statusValue) > -1;
-
-                    tr[i].style.display = (matchSearch && matchStatus) ? '' : 'none';
-                }
-            }
-        }
-
-        function exportarAExcel() {
-            // Obtener los valores actuales de los filtros
-            var searchText = document.getElementById('searchInput').value;
-            var filterStatus = document.getElementById('filterStatus').value;
-
-            // Construir la URL con los filtros
-            var url = '../Controlador/exportar_solicitudes_excel.php?';
-
-            if (searchText) {
-                url += 'busqueda=' + encodeURIComponent(searchText) + '&';
-            }
-
-            if (filterStatus) {
-                url += 'estado=' + encodeURIComponent(filterStatus) + '&';
-            }
-
-            // Eliminar el último & si existe
-            url = url.replace(/&$/, '');
-
-            // Redireccionar para descargar el archivo
-            window.location.href = url;
-        }
-
-        // Event listeners
-        document.getElementById('searchInput').addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') {
-                filtrarTabla();
-            }
-        });
-
-        document.getElementById('filterStatus').addEventListener('change', filtrarTabla);
-    </script>
 </body>
 
 </html>
